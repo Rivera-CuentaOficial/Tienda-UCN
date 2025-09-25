@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,13 @@ var app = builder.Build();
 builder.Host.UseSerilog(
     (context, services, configuration) =>
         configuration.ReadFrom.Configuration(context.Configuration).ReadFrom.Services(services)
+);
+#endregion
+
+#region Database Configuration
+Log.Information("Configuring SQLite database...");
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseSqlite(builder.Configuration.GetSection("ConnectionStrings:SqliteDatabase").Value)
 );
 #endregion
 
