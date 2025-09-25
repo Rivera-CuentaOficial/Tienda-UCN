@@ -1,3 +1,5 @@
+using Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,6 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+#region Logging Configuration
+builder.Host.UseSerilog(
+    (context, services, configuration) =>
+        configuration.ReadFrom.Configuration(context.Configuration).ReadFrom.Services(services)
+);
+#endregion
 
 app.MapOpenApi();
 
