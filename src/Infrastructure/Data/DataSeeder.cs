@@ -2,10 +2,6 @@ using Bogus;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 public class DataSeeder
 {
@@ -95,6 +91,13 @@ public class DataSeeder
                 var adminResult = await userManager.CreateAsync(adminUser, adminPassword);
                 if (adminResult.Succeeded)
                 {
+                    if (adminRole == null || string.IsNullOrEmpty(adminRole.Name))
+                    {
+                        Log.Error("El rol 'Admin' no existe o no tiene nombre.");
+                        throw new InvalidOperationException(
+                            "El rol 'Admin' no existe o no tiene nombre."
+                        );
+                    }
                     var roleResult = await userManager.AddToRoleAsync(adminUser, adminRole.Name!);
                     if (!roleResult.Succeeded)
                     {
@@ -142,7 +145,14 @@ public class DataSeeder
 
                     if (result.Succeeded)
                     {
-                        var roleResult = await userManager.AddToRoleAsync(user, customerRole.Name!);
+                        if (customerRole == null || string.IsNullOrEmpty(customerRole.Name))
+                        {
+                            Log.Error("El rol 'Customer' no existe o no tiene nombre.");
+                            throw new InvalidOperationException(
+                                "El rol 'Customer' no existe o no tiene nombre."
+                            );
+                        }
+                        var roleResult = await userManager.AddToRoleAsync(user, customerRole.Name);
                         if (!roleResult.Succeeded)
                         {
                             Log.Error(
