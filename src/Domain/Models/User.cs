@@ -1,4 +1,7 @@
+using Bogus.DataSets;
 using Microsoft.AspNetCore.Identity;
+
+namespace TiendaUCN.Domain.Models;
 
 public enum Gender
 {

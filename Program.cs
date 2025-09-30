@@ -1,12 +1,21 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using TiendaUCN.API.Middlewares;
+using TiendaUCN.Application.Infrastructure.Repositories.Implements;
+using TiendaUCN.Application.Infrastructure.Repositories.Interfaces;
+using TiendaUCN.Application.Services.Implements;
+using TiendaUCN.Application.Services.Interfaces;
+using TiendaUCN.Domain.Models;
+using TiendaUCN.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddControllers();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 #region Logging Configuration
 builder.Host.UseSerilog(
@@ -58,6 +67,8 @@ using (var scope = app.Services.CreateScope())
 }
 #endregion
 
-app.MapOpenApi();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+app.MapOpenApi();
+app.MapControllers();
 app.Run();
