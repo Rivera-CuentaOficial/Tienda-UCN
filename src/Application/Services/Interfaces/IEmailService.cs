@@ -1,0 +1,1 @@
+namespace TiendaUCN.Application.Services.Interfaces;
