@@ -13,4 +13,11 @@ public class AuthController(IUserService userService) : BaseController
         var token = await _userservice.LoginAsync(loginDTO, HttpContext);
         return Ok(new { Token = token });
     }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
+    {
+        var message = await _userservice.RegisterAsync(registerDTO, HttpContext);
+        return Ok(new { Message = message });
+    }
 }

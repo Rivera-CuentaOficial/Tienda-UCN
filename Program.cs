@@ -1,21 +1,36 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Resend;
 using Serilog;
 using TiendaUCN.API.Middlewares;
 using TiendaUCN.Application.Infrastructure.Repositories.Implements;
 using TiendaUCN.Application.Infrastructure.Repositories.Interfaces;
+using TiendaUCN.Application.Mappers;
 using TiendaUCN.Application.Services.Implements;
 using TiendaUCN.Application.Services.Interfaces;
 using TiendaUCN.Domain.Models;
 using TiendaUCN.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+MapperExtensions.ConfigureMapster();
 
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+
+#region Email Service Configuration
+builder.Services.AddOptions();
+builder.Services.AddHttpClient<ResendClient>();
+builder.Services.Configure<ResendClientOptions>(o =>
+{
+    o.ApiToken = Environment.GetEnvironmentVariable(
+        builder.Configuration.GetValue<string>("ResendAPIKey")!
+    )!;
+});
+builder.Services.AddTransient<IResend, ResendClient>();
+#endregion
 
 #region Logging Configuration
 builder.Host.UseSerilog(
