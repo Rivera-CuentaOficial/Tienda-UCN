@@ -1,4 +1,5 @@
 using Mapster;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Serilog;
 using TiendaUCN.Application.DTOs.AuthResponse;
 using TiendaUCN.Application.Infrastructure.Repositories.Interfaces;
@@ -142,12 +143,174 @@ public class UserService : IUserService
             registerDTO.Email,
             ipAddress
         );
-        await _emailService.SendVerificationCodeEmailAsync(registerDTO.Email, code);
+        await _emailService.SendVerificationCodeEmailAsync(
+            registerDTO.Email,
+            createNewVerificationCode.Code
+        );
         Log.Information(
             "Correo de verificación enviado a {Email} desde la IP {IP}",
             registerDTO.Email,
             ipAddress
         );
         return "Usuario registrado exitosamente. Por favor, verifica tu correo electrónico.";
+    }
+
+    public async Task<string> VerifyEmailAsync(VerifyDTO verifyDTO, HttpContext httpContext)
+    {
+        User? user = await _userRepository.GetByEmailAsync(verifyDTO.Email);
+        if (user == null)
+        {
+            Log.Information(
+                "Intento de verificación de correo fallido para {Email} - Usuario no encontrado",
+                verifyDTO.Email
+            );
+            throw new KeyNotFoundException("Usuario no encontrado.");
+        }
+        if (user.EmailConfirmed)
+        {
+            Log.Information(
+                "Intento de verificación de correo fallido para {Email} - Correo ya verificado",
+                verifyDTO.Email
+            );
+            throw new InvalidOperationException("El correo ya ha sido verificado.");
+        }
+        CodeType codeType = CodeType.EmailVerification;
+
+        var verificationCode = await _verificationCodeRepository.GetByLatestUserIdAsync(
+            user.Id,
+            codeType
+        );
+        if (verificationCode == null)
+        {
+            Log.Information(
+                "Intento de verificación de correo fallido para {Email} - Código no encontrado",
+                verifyDTO.Email
+            );
+            throw new KeyNotFoundException("Código de verificación no encontrado.");
+        }
+        if (
+            verificationCode.Code != verifyDTO.VerificationCode
+            || DateTime.UtcNow >= verificationCode.Expiration
+        )
+        {
+            int attempsCountUpdated = await _verificationCodeRepository.IncreaseAttemptsAsync(
+                user.Id,
+                codeType
+            );
+            Log.Warning(
+                $"Código de verificación incorrecto o expirado para el usuario: {verifyDTO.Email}. Intentos actuales: {attempsCountUpdated}"
+            );
+            if (attempsCountUpdated >= 5)
+            {
+                Log.Warning(
+                    $"Se ha alcanzado el límite de intentos para el usuario: {verifyDTO.Email}"
+                );
+                bool codeDeleteResult = await _verificationCodeRepository.DeleteByUserIdAsync(
+                    user.Id,
+                    codeType
+                );
+                if (codeDeleteResult)
+                {
+                    Log.Warning(
+                        $"Se ha eliminado el código de verificación para el usuario: {verifyDTO.Email}"
+                    );
+                    bool userDeleteResult = await _userRepository.DeleteAsync(user.Id);
+                    if (userDeleteResult)
+                    {
+                        Log.Warning($"Se ha eliminado el usuario: {verifyDTO.Email}");
+                        throw new ArgumentException(
+                            "Se ha alcanzado el límite de intentos. El usuario ha sido eliminado."
+                        );
+                    }
+                }
+            }
+            if (DateTime.UtcNow >= verificationCode.Expiration)
+            {
+                Log.Warning(
+                    $"El código de verificación ha expirado para el usuario: {verifyDTO.Email}"
+                );
+                throw new ArgumentException("El código de verificación ha expirado.");
+            }
+            else
+            {
+                Log.Warning(
+                    $"El código de verificación es incorrecto para el usuario: {verifyDTO.Email}"
+                );
+                throw new ArgumentException(
+                    $"El código de verificación es incorrecto, quedan {5 - attempsCountUpdated} intentos."
+                );
+            }
+        }
+        bool emailConfirmed = await _userRepository.ConfirmEmailAsync(user.Email!);
+        if (emailConfirmed)
+        {
+            bool codeDeleteResult = await _verificationCodeRepository.DeleteByUserIdAsync(
+                user.Id,
+                codeType
+            );
+            if (codeDeleteResult)
+            {
+                Log.Warning(
+                    $"Se ha eliminado el código de verificación para el usuario: {verifyDTO.Email}"
+                );
+                await _emailService.SendWelcomeEmailAsync(user.Email!);
+                Log.Information(
+                    $"El correo electrónico del usuario {verifyDTO.Email} ha sido confirmado exitosamente."
+                );
+                return "!Ya puedes iniciar sesión y disfrutar de todos los beneficios de Tienda UCN!";
+            }
+            throw new Exception("Error al confirmar el correo electrónico.");
+        }
+        throw new Exception("Error al verificar el correo electrónico.");
+    }
+
+    public async Task<string> ResendVerifyEmail(ResendVerifyDTO resendVerifyDTO)
+    {
+        var currentTime = DateTime.UtcNow;
+        User? user = await _userRepository.GetByEmailAsync(resendVerifyDTO.Email);
+        if (user == null)
+        {
+            Log.Warning($"El usuario con el correo {resendVerifyDTO.Email} no existe.");
+            throw new KeyNotFoundException("El usuario no existe.");
+        }
+        if (user.EmailConfirmed)
+        {
+            Log.Warning(
+                $"El usuario con el correo {resendVerifyDTO.Email} ya ha verificado su correo electrónico."
+            );
+            throw new InvalidOperationException("El correo electrónico ya ha sido verificado.");
+        }
+        VerificationCode? verificationCode =
+            await _verificationCodeRepository.GetLatestByUserIdAsync(
+                user.Id,
+                CodeType.EmailVerification
+            );
+        var expirationTime = verificationCode!.CreatedAt.AddMinutes(
+            _verificationCodeExpirationInMinutes
+        );
+        if (expirationTime > currentTime)
+        {
+            int remainingSeconds = (int)(expirationTime - currentTime).TotalSeconds;
+            Log.Warning(
+                $"El usuario {resendVerifyDTO.Email} ha solicitado un reenvío del código de verificación antes de los {_verificationCodeExpirationInMinutes} minutos."
+            );
+            throw new TimeoutException(
+                $"Debe esperar {remainingSeconds} segundos para solicitar un nuevo código de verificación."
+            );
+        }
+        string newCode = new Random().Next(100000, 999999).ToString();
+        verificationCode.Code = newCode;
+        verificationCode.Expiration = DateTime.UtcNow.AddMinutes(
+            _verificationCodeExpirationInMinutes
+        );
+        await _verificationCodeRepository.UpdateAsync(verificationCode);
+        Log.Information(
+            $"Nuevo código de verificación generado para el usuario: {resendVerifyDTO.Email} - Código: {newCode}"
+        );
+        await _emailService.SendVerificationCodeEmailAsync(user.Email!, newCode);
+        Log.Information(
+            $"Se ha reenviado un nuevo código de verificación al correo electrónico: {resendVerifyDTO.Email}"
+        );
+        return "Se ha reenviado un nuevo código de verificación a su correo electrónico.";
     }
 }

@@ -6,5 +6,7 @@ namespace TiendaUCN.Application.Services.Interfaces
     {
         Task<string> LoginAsync(LoginDTO loginDTO, HttpContext httpContext);
         Task<string> RegisterAsync(RegisterDTO registerDTO, HttpContext httpContext);
+        Task<string> VerifyEmailAsync(VerifyDTO verifyEmailDTO, HttpContext httpContext);
+        Task<string> ResendVerifyEmail(ResendVerifyDTO resendVerifyDTO);
     }
 }

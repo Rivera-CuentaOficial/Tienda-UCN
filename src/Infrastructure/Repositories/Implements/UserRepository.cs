@@ -53,4 +53,19 @@ public class UserRepository : IUserRepository
         }
         return false;
     }
+
+    public async Task<bool> ConfirmEmailAsync(string email)
+    {
+        var result = await _context
+            .Users.Where(u => u.Email == email)
+            .ExecuteUpdateAsync(u => u.SetProperty(user => user.EmailConfirmed, true));
+        return result > 0;
+    }
+
+    public async Task<bool> DeleteAsync(int userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        var result = await _userManager.DeleteAsync(user!);
+        return result.Succeeded;
+    }
 }

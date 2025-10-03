@@ -11,4 +11,6 @@ public interface IUserRepository
     Task<bool> ExistsByRutAsync(string rut);
 
     Task<bool> CreateAsync(User user, string password);
+    Task<bool> ConfirmEmailAsync(string email);
+    Task<bool> DeleteAsync(int userId);
 }
