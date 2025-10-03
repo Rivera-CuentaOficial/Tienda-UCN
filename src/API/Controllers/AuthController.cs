@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TiendaUCN.API.Controllers;
+using TiendaUCN.Application.DTO.BaseResponse;
 using TiendaUCN.Application.DTOs.AuthResponse;
 using TiendaUCN.Application.Services.Interfaces;
 
@@ -18,6 +19,6 @@ public class AuthController(IUserService userService) : BaseController
     public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
     {
         var message = await _userservice.RegisterAsync(registerDTO, HttpContext);
-        return Ok(new { Message = message });
+        return Ok(new GenericResponse<string>("Registro exitoso", message));
     }
 }

@@ -67,7 +67,6 @@ public class EmailService : IEmailService
             _webHostEnvironment.ContentRootPath,
             "src",
             "Application",
-            "Services",
             "Templates",
             "Emails",
             $"{templateName}.html"
