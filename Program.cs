@@ -1,21 +1,39 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Resend;
 using Serilog;
 using TiendaUCN.API.Middlewares;
 using TiendaUCN.Application.Infrastructure.Repositories.Implements;
 using TiendaUCN.Application.Infrastructure.Repositories.Interfaces;
+using TiendaUCN.Application.Mappers;
 using TiendaUCN.Application.Services.Implements;
 using TiendaUCN.Application.Services.Interfaces;
 using TiendaUCN.Domain.Models;
 using TiendaUCN.Infrastructure.Data;
+using TiendaUCN.Infrastructure.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
+MapperExtensions.ConfigureMapster();
 
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IVerificationCodeRepository, VerificationCodeRepository>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+#region Email Service Configuration
+builder.Services.AddOptions();
+builder.Services.AddHttpClient<ResendClient>();
+builder.Services.Configure<ResendClientOptions>(o =>
+{
+    o.ApiToken =
+        builder.Configuration.GetValue<string>("ResendAPIKey")
+        ?? throw new InvalidOperationException("ResendAPIKey no esta configurada");
+});
+builder.Services.AddTransient<IResend, ResendClient>();
+#endregion
 
 #region Logging Configuration
 builder.Host.UseSerilog(

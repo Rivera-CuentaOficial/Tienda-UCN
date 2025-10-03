@@ -1,16 +1,38 @@
 using Microsoft.AspNetCore.Mvc;
 using TiendaUCN.API.Controllers;
+using TiendaUCN.Application.DTO.BaseResponse;
 using TiendaUCN.Application.DTOs.AuthResponse;
 using TiendaUCN.Application.Services.Interfaces;
 
 public class AuthController(IUserService userService) : BaseController
 {
-    private readonly IUserService _userservice = userService;
+    private readonly IUserService _userService = userService;
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
     {
-        var token = await _userservice.LoginAsync(loginDTO, HttpContext);
-        return Ok(new { Token = token });
+        var token = await _userService.LoginAsync(loginDTO, HttpContext);
+        return Ok(new GenericResponse<string>("Login exitoso", token));
+    }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
+    {
+        var message = await _userService.RegisterAsync(registerDTO, HttpContext);
+        return Ok(new GenericResponse<string>("Registro exitoso", message));
+    }
+
+    [HttpPost("verify-email")]
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyDTO verifyEmailDTO)
+    {
+        var message = await _userService.VerifyEmailAsync(verifyEmailDTO, HttpContext);
+        return Ok(new GenericResponse<string>("Verificación exitosa", message));
+    }
+
+    [HttpPost("resend-verify-email")]
+    public async Task<IActionResult> ResendVerifyEmail([FromBody] ResendVerifyDTO resendVerifyDTO)
+    {
+        var message = await _userService.ResendVerifyEmail(resendVerifyDTO);
+        return Ok(new GenericResponse<string>("Código reenviado exitosamente", message));
     }
 }

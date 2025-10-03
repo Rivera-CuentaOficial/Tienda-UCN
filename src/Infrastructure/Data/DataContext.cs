@@ -8,4 +8,6 @@ public class DataContext : IdentityDbContext<User, Role, int>
 {
     public DataContext(DbContextOptions<DataContext> options)
         : base(options) { }
+
+    public DbSet<VerificationCode> VerificationCodes { get; set; }
 }
