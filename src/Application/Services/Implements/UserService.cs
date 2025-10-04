@@ -18,6 +18,14 @@ public class UserService : IUserService
     private readonly IConfiguration _configuration;
     private readonly int _verificationCodeExpirationInMinutes;
 
+    /// <summary>
+    /// Inicializa una nueva instancia de la clase <see cref="UserService"/>.
+    /// </summary>
+    /// <param name="tokenService">Servicio para la generación y validación de tokens.</param>
+    /// <param name="userRepository">Repositorio para el acceso a datos de usuarios.</param>
+    /// <param name="emailService">Servicio para el envío de correos electrónicos.</param>
+    /// <param name="verificationCodeRepository">Repositorio para la gestión de códigos de verificación.</param>
+    /// <param name="configuration">Configuración de la aplicación.</param>
     public UserService(
         ITokenService tokenService,
         IUserRepository userRepository,
@@ -112,6 +120,7 @@ public class UserService : IUserService
             throw new InvalidOperationException("El Rut ya está registrado.");
         }
         var user = registerDTO.Adapt<User>();
+        user.PhoneNumber = NormalizePhoneNumber(registerDTO.PhoneNumber);
         var result = await _userRepository.CreateAsync(user, registerDTO.Password);
         if (!result)
         {
@@ -312,5 +321,156 @@ public class UserService : IUserService
             $"Se ha reenviado un nuevo código de verificación al correo electrónico: {resendVerifyDTO.Email}"
         );
         return "Se ha reenviado un nuevo código de verificación a su correo electrónico.";
+    }
+
+    public async Task<string> SendPasswordRecoveryEmail(
+        RecoverPasswordDTO recoverPasswordDTO,
+        HttpContext httpContext
+    )
+    {
+        var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "IP desconocida";
+        User? user = await _userRepository.GetByEmailAsync(recoverPasswordDTO.Email);
+        if (user == null)
+        {
+            Log.Warning($"El usuario con el correo {recoverPasswordDTO.Email} no existe.");
+            throw new KeyNotFoundException("El usuario no existe.");
+        }
+        if (!user.EmailConfirmed)
+        {
+            Log.Warning(
+                $"EL usuario con el correo {recoverPasswordDTO} no ha verificado su correo."
+            );
+            throw new InvalidOperationException("El usuario no ha activado su cuenta.");
+        }
+        var code = new Random().Next(100000, 999999).ToString();
+        VerificationCode verificationCode = new VerificationCode
+        {
+            Type = CodeType.PasswordReset,
+            Code = code,
+            Expiration = DateTime.UtcNow.AddMinutes(_verificationCodeExpirationInMinutes),
+            UserId = user.Id,
+        };
+        var createNewVerificationCode = await _verificationCodeRepository.CreateAsync(
+            verificationCode
+        );
+        Log.Information(
+            "Código de para cambio de contraseña generado para el usuario {Email} desde la IP {IP}",
+            recoverPasswordDTO.Email,
+            ipAddress
+        );
+        await _emailService.SendPasswordRecoveryEmail(
+            recoverPasswordDTO.Email,
+            createNewVerificationCode.Code
+        );
+        Log.Information(
+            "Correo de verificación enviado a {Email} desde la IP {IP}",
+            recoverPasswordDTO.Email,
+            ipAddress
+        );
+        return "Codigo de recuperacion enviado exitosamente.";
+    }
+
+    public async Task<string> ChangeUserPasswordByEmailAsync(ResetPasswordDTO resetPasswordDTO)
+    {
+        User? user = await _userRepository.GetByEmailAsync(resetPasswordDTO.Email);
+        if (user == null)
+        {
+            Log.Information(
+                "Intento de cambio de contraseña fallido para {Email} - Usuario no encontrado",
+                resetPasswordDTO.Email
+            );
+            throw new KeyNotFoundException("Usuario no encontrado.");
+        }
+        if (!user.EmailConfirmed)
+        {
+            Log.Information(
+                "Intento de cambio de contraseña fallido para {Email} - Correo no verificado",
+                resetPasswordDTO.Email
+            );
+            throw new InvalidOperationException("El correo no ha sido verificado.");
+        }
+
+        CodeType type = CodeType.PasswordReset;
+
+        var verificationCode = await _verificationCodeRepository.GetByLatestUserIdAsync(
+            user.Id,
+            type
+        );
+        if (verificationCode == null)
+        {
+            Log.Information(
+                "Intento de cambio de contraseña fallido para {Email} - Código no encontrado",
+                resetPasswordDTO.Email
+            );
+            throw new KeyNotFoundException("Código de cambio de contraseña no encontrado.");
+        }
+        if (
+            verificationCode.Code != resetPasswordDTO.Code
+            || DateTime.UtcNow >= verificationCode.Expiration
+        )
+        {
+            int attempsCountUpdated = await _verificationCodeRepository.IncreaseAttemptsAsync(
+                user.Id,
+                type
+            );
+            Log.Warning(
+                $"Código de cambio de contraseña incorrecto o expirado para el usuario: {resetPasswordDTO.Email}. Intentos actuales: {attempsCountUpdated}"
+            );
+            if (attempsCountUpdated >= 5)
+            {
+                Log.Warning(
+                    $"Se ha alcanzado el límite de intentos para el usuario: {resetPasswordDTO.Email}"
+                );
+                bool codeDeleteResult = await _verificationCodeRepository.DeleteByUserIdAsync(
+                    user.Id,
+                    type
+                );
+                if (codeDeleteResult)
+                {
+                    Log.Warning(
+                        $"Se ha eliminado el código de cambio de contraseña para el usuario: {resetPasswordDTO.Email}"
+                    );
+                }
+            }
+            if (DateTime.UtcNow >= verificationCode.Expiration)
+            {
+                Log.Warning(
+                    $"El código de cambio de contraseña ha expirado para el usuario: {resetPasswordDTO.Email}"
+                );
+                throw new ArgumentException("El código de cambio de contraseña ha expirado.");
+            }
+            else
+            {
+                Log.Warning(
+                    $"El código de cambio de contraseña es incorrecto para el usuario: {resetPasswordDTO.Email}"
+                );
+                throw new ArgumentException(
+                    $"El código de cambio de contraseña es incorrecto, quedan {5 - attempsCountUpdated} intentos."
+                );
+            }
+        }
+        bool changePassword = await _userRepository.ChangeUserPasswordAsync(
+            user,
+            resetPasswordDTO.NewPassword
+        );
+        if (!changePassword)
+        {
+            Log.Warning(
+                $"No se pudo actualizar la contraseña para el usuario {resetPasswordDTO.Email}."
+            );
+            throw new InvalidOperationException("No se pudo actualizar la contraseña.");
+        }
+        Log.Information($"Contraseña actualizada para el usuario {resetPasswordDTO.Email}");
+        await _verificationCodeRepository.DeleteByUserIdAsync(user.Id, type);
+        Log.Warning(
+            $"Se ha eliminado el código de cambio de contraseña para el usuario: {resetPasswordDTO.Email}"
+        );
+        return "Se ha reseteado la contraseña correctamente";
+    }
+
+    public string NormalizePhoneNumber(string phoneNumber)
+    {
+        var digits = new string(phoneNumber.Where(char.IsDigit).ToArray());
+        return "+56 " + digits;
     }
 }

@@ -35,4 +35,20 @@ public class AuthController(IUserService userService) : BaseController
         var message = await _userService.ResendVerifyEmail(resendVerifyDTO);
         return Ok(new GenericResponse<string>("Código reenviado exitosamente", message));
     }
+
+    [HttpPost("recover-password")]
+    public async Task<IActionResult> SendPasswordRecoveryEmail(
+        [FromBody] RecoverPasswordDTO recoverPasswordDTO
+    )
+    {
+        var message = await _userService.SendPasswordRecoveryEmail(recoverPasswordDTO, HttpContext);
+        return Ok(new GenericResponse<string>("Email enviado exitosamente", message));
+    }
+
+    [HttpPatch("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO resetPasswordDTO)
+    {
+        var message = await _userService.ChangeUserPasswordByEmailAsync(resetPasswordDTO);
+        return Ok(new GenericResponse<string>("Contraseña cambiada exitosamente", message));
+    }
 }

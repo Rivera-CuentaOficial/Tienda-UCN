@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using TiendaUCN.Application.Infrastructure.Repositories.Interfaces;
 using TiendaUCN.Domain.Models;
 using TiendaUCN.Infrastructure.Data;
@@ -60,6 +61,23 @@ public class UserRepository : IUserRepository
             .Users.Where(u => u.Email == email)
             .ExecuteUpdateAsync(u => u.SetProperty(user => user.EmailConfirmed, true));
         return result > 0;
+    }
+
+    public async Task<bool> ChangeUserPasswordAsync(User user, string newPassword)
+    {
+        var removePassword = await _userManager.RemovePasswordAsync(user);
+        if (removePassword.Succeeded)
+        {
+            Log.Information("Contraseña antigua removida.");
+            var createNewPassword = await _userManager.AddPasswordAsync(user, newPassword);
+            if (createNewPassword.Succeeded)
+            {
+                Log.Information("Nueva contraseña insertada.");
+                return createNewPassword.Succeeded;
+            }
+            ;
+        }
+        return removePassword.Succeeded;
     }
 
     public async Task<bool> DeleteAsync(int userId)

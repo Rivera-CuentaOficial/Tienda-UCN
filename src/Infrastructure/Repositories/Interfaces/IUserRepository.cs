@@ -9,8 +9,8 @@ public interface IUserRepository
     Task<string> GetUserRoleAsync(User user);
     Task<bool> ExistsByEmailAsync(string email);
     Task<bool> ExistsByRutAsync(string rut);
-
     Task<bool> CreateAsync(User user, string password);
     Task<bool> ConfirmEmailAsync(string email);
+    Task<bool> ChangeUserPasswordAsync(User user, string newPassword);
     Task<bool> DeleteAsync(int userId);
 }
