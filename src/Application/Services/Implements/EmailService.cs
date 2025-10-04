@@ -61,6 +61,25 @@ public class EmailService : IEmailService
         await _resend.EmailSendAsync(message);
     }
 
+    public async Task SendPasswordRecoveryEmail(string email, string code)
+    {
+        var htmlBody = await LoadTemplate("PasswordRecovery", code);
+        var message = new EmailMessage
+        {
+            From =
+                _configuration.GetValue<string>("EmailConfiguration:From")
+                ?? throw new InvalidOperationException("Email 'From' no esta configurado."),
+            To = email,
+            Subject =
+                _configuration.GetValue<string>("EmailConfiguration:PasswordRecoverySubject")
+                ?? throw new InvalidOperationException(
+                    "Email 'PasswordRecoverySubject' no esta configurado."
+                ),
+            HtmlBody = htmlBody,
+        };
+        await _resend.EmailSendAsync(message);
+    }
+
     public async Task<string> LoadTemplate(string templateName, string? code)
     {
         var template = Path.Combine(
