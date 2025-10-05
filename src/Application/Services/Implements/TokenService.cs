@@ -30,12 +30,15 @@ public class TokenService : ITokenService
     {
         try
         {
-            var claims = new List<Claim>();
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString());
-            new Claim(ClaimTypes.Role, rolename);
-            new Claim(ClaimTypes.Email, user.Email!);
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Role, rolename),
+                new Claim(ClaimTypes.Email, user.Email!),
+            };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_jwtSecret));
+
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(

@@ -178,6 +178,72 @@ public class DataSeeder
                 }
                 Log.Information("Usuarios creados con éxito.");
             }
+            //Creacion de categorias
+            if (!context.Categories.Any())
+            {
+                var categories = new List<Category>
+                {
+                    new Category { Name = "Electronics" },
+                    new Category { Name = "Clothing" },
+                    new Category { Name = "Home Appliances" },
+                    new Category { Name = "Books" },
+                    new Category { Name = "Sports" },
+                };
+                await context.Categories.AddRangeAsync(categories);
+                await context.SaveChangesAsync();
+                Log.Information("Categorías creadas con éxito.");
+            }
+            //Creacion de marcas
+            if (!await context.Brands.AnyAsync())
+            {
+                var brands = new List<Brand>
+                {
+                    new Brand { Name = "Sony" },
+                    new Brand { Name = "Apple" },
+                    new Brand { Name = "HP" },
+                };
+                await context.Brands.AddRangeAsync(brands);
+                await context.SaveChangesAsync();
+                Log.Information("Marcas creadas con éxito.");
+            }
+            //Creacion de productos
+            if (!await context.Products.AnyAsync())
+            {
+                var categoryIds = await context.Categories.Select(c => c.Id).ToListAsync();
+                var brandIds = await context.Brands.Select(b => b.Id).ToListAsync();
+
+                if (categoryIds.Any() && brandIds.Any())
+                {
+                    var productFaker = new Faker<Product>()
+                        .RuleFor(p => p.Title, f => f.Commerce.ProductName())
+                        .RuleFor(p => p.Description, f => f.Commerce.ProductDescription())
+                        .RuleFor(p => p.Price, f => f.Random.Int(1000, 100000))
+                        .RuleFor(p => p.Stock, f => f.Random.Int(1, 100))
+                        .RuleFor(p => p.CategoryId, f => f.PickRandom(categoryIds))
+                        .RuleFor(p => p.BrandId, f => f.PickRandom(brandIds))
+                        .RuleFor(p => p.Status, f => f.PickRandom<Status>());
+
+                    var products = productFaker.Generate(50);
+                    await context.Products.AddRangeAsync(products);
+                    await context.SaveChangesAsync();
+                    Log.Information("Productos creados con éxito.");
+                }
+
+                // Creación de imágenes
+                if (!await context.Images.AnyAsync())
+                {
+                    var productIds = await context.Products.Select(p => p.Id).ToListAsync();
+                    var imageFaker = new Faker<Image>()
+                        .RuleFor(i => i.ImageUrl, f => f.Image.PicsumUrl())
+                        .RuleFor(i => i.PublicId, f => f.Random.Guid().ToString())
+                        .RuleFor(i => i.ProductId, f => f.PickRandom(productIds));
+
+                    var images = imageFaker.Generate(20);
+                    await context.Images.AddRangeAsync(images);
+                    await context.SaveChangesAsync();
+                    Log.Information("Imágenes creadas con éxito.");
+                }
+            }
         }
         catch (Exception ex)
         {

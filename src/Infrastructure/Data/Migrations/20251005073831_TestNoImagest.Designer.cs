@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TiendaUCN.Infrastructure.Data;
 
@@ -10,9 +11,11 @@ using TiendaUCN.Infrastructure.Data;
 namespace TiendaUCN.src.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20251005073831_Test No Imagest")]
+    partial class TestNoImagest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
@@ -173,8 +176,6 @@ namespace TiendaUCN.src.Infrastructure.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("Images");
                 });
@@ -426,15 +427,6 @@ namespace TiendaUCN.src.Infrastructure.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TiendaUCN.Domain.Models.Image", b =>
-                {
-                    b.HasOne("TiendaUCN.Domain.Models.Product", null)
-                        .WithMany("Images")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("TiendaUCN.Domain.Models.Product", b =>
                 {
                     b.HasOne("TiendaUCN.Domain.Models.Brand", "Brand")
@@ -452,11 +444,6 @@ namespace TiendaUCN.src.Infrastructure.Data.Migrations
                     b.Navigation("Brand");
 
                     b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("TiendaUCN.Domain.Models.Product", b =>
-                {
-                    b.Navigation("Images");
                 });
 #pragma warning restore 612, 618
         }

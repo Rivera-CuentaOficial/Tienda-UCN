@@ -2,11 +2,16 @@ using Mapster;
 
 namespace TiendaUCN.Application.Mappers;
 
-public static class MapperExtensions
+public class MapperExtensions
 {
-    public static void ConfigureMapster()
+    public static void ConfigureMapster(IServiceProvider serviceProvider)
     {
-        UserMapper.ConfigureAllMapping();
+        var userMapper = serviceProvider.GetService<UserMapper>();
+        userMapper?.ConfigureAllMapping();
+
+        var productMapper = serviceProvider.GetService<ProductMapper>();
+        productMapper?.ConfigureAllMappings();
+
         TypeAdapterConfig.GlobalSettings.Default.IgnoreNullValues(true);
     }
 }
