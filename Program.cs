@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Resend;
@@ -13,13 +14,18 @@ using TiendaUCN.Infrastructure.Data;
 using TiendaUCN.Infrastructure.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
-MapperExtensions.ConfigureMapster();
+
+builder.Services.AddScoped<UserMapper>();
+builder.Services.AddScoped<ProductMapper>();
 
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IVerificationCodeRepository, VerificationCodeRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
@@ -64,8 +70,37 @@ builder
                 .Value
             ?? throw new InvalidOperationException("AllowedUserNameCharacters not configured");
     })
+    .AddRoles<Role>()
     .AddEntityFrameworkStores<DataContext>()
     .AddDefaultTokenProviders();
+#endregion
+
+#region Authentication Configuration
+Log.Information("Configurando autenticación JWT");
+builder
+    .Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        string jwtSecret =
+            builder.Configuration["JWTSecret"]
+            ?? throw new InvalidOperationException("La clave secreta JWT no está configurada.");
+        options.TokenValidationParameters =
+            new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+                    System.Text.Encoding.UTF8.GetBytes(jwtSecret)
+                ),
+                ValidateLifetime = true,
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero, //Sin tolerencia a tokens expirados
+            };
+    });
 #endregion
 
 #region Database Configuration
@@ -82,6 +117,8 @@ Log.Information("Migrating and seeding database...");
 using (var scope = app.Services.CreateScope())
 {
     await DataSeeder.Initialize(app.Services);
+
+    MapperExtensions.ConfigureMapster(scope.ServiceProvider);
 }
 #endregion
 

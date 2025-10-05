@@ -4,9 +4,9 @@ using TiendaUCN.Domain.Models;
 
 namespace TiendaUCN.Application.Mappers;
 
-public static class UserMapper
+public class UserMapper
 {
-    public static void ConfigureAllMapping()
+    public void ConfigureAllMapping()
     {
         ConfigureAuthMapping();
     }
