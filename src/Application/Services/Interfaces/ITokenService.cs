@@ -1,6 +1,6 @@
-using TiendaUCN.Domain.Models;
+using TiendaUCN.src.Domain.Models;
 
-namespace TiendaUCN.Application.Services.Interfaces;
+namespace TiendaUCN.src.Application.Services.Interfaces;
 
 public interface ITokenService
 {

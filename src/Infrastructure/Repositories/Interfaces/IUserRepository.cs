@@ -1,9 +1,10 @@
-using TiendaUCN.Domain.Models;
+using TiendaUCN.src.Domain.Models;
 
-namespace TiendaUCN.Application.Infrastructure.Repositories.Interfaces;
+namespace TiendaUCN.src.Infrastructure.Repositories.Interfaces;
 
 public interface IUserRepository
 {
+    Task<User?> GetByIdAsync(int id);
     Task<User> GetByEmailAsync(string email);
     Task<bool> CheckPasswordAsync(User user, string password);
     Task<string> GetUserRoleAsync(User user);
@@ -13,4 +14,6 @@ public interface IUserRepository
     Task<bool> ConfirmEmailAsync(string email);
     Task<bool> ChangeUserPasswordAsync(User user, string newPassword);
     Task<bool> DeleteAsync(int userId);
+    Task<int> DeleteUnconfirmedAsync();
+
 }

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Versioning;
 
-namespace TiendaUCN.Application.DTOs.AuthResponse;
+namespace TiendaUCN.src.Application.DTOs.AuthResponse;
 
 public class ResetPasswordDTO
 {

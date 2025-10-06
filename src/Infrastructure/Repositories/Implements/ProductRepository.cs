@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using TiendaUCN.Application.DTOs.ProductResponse;
-using TiendaUCN.Application.Infrastructure.Repositories.Interfaces;
-using TiendaUCN.Domain.Models;
-using TiendaUCN.Infrastructure.Data;
+using TiendaUCN.src.Application.DTOs.ProductResponse;
+using TiendaUCN.src.Domain.Models;
+using TiendaUCN.src.Infrastructure.Data;
+using TiendaUCN.src.Infrastructure.Repositories.Interfaces;
 
-namespace TiendaUCN.Application.Infrastructure.Repositories.Implements;
+namespace TiendaUCN.src.Infrastructure.Repositories.Implements;
 
 public class ProductRepository : IProductRepository
 {

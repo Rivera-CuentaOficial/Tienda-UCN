@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TiendaUCN.Application.Validators;
+namespace TiendaUCN.src.Application.Validators;
 
 public class RutValidationAttribute : ValidationAttribute
 {

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TiendaUCN.Application.DTOs.AuthResponse
+namespace TiendaUCN.src.Application.DTOs.AuthResponse
 {
     public class ResendVerifyDTO
     {

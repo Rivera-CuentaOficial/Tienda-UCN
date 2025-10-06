@@ -1,7 +1,7 @@
-using TiendaUCN.Application.DTOs.ProductResponse;
-using TiendaUCN.Domain.Models;
+using TiendaUCN.src.Application.DTOs.ProductResponse;
+using TiendaUCN.src.Domain.Models;
 
-namespace TiendaUCN.Application.Infrastructure.Repositories.Interfaces;
+namespace TiendaUCN.src.Infrastructure.Repositories.Interfaces;
 
 public interface IProductRepository
 {

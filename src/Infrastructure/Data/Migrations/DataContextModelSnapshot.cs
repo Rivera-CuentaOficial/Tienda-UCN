@@ -3,7 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TiendaUCN.Infrastructure.Data;
+using TiendaUCN.src.Infrastructure.Data;
 
 #nullable disable
 

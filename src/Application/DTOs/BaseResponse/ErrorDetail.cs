@@ -1,4 +1,4 @@
-namespace TiendaUCN.Application.DTOs.BaseResponse;
+namespace TiendaUCN.src.Application.DTOs.BaseResponse;
 
 public class ErrorDetail(string message, string? details = null)
 {

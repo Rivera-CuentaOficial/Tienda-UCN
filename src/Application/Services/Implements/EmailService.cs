@@ -2,9 +2,9 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Resend;
 using Serilog;
-using TiendaUCN.Application.Services.Interfaces;
+using TiendaUCN.src.Application.Services.Interfaces;
 
-namespace TiendaUCN.Application.Services.Implements;
+namespace TiendaUCN.src.Application.Services.Implements;
 
 public class EmailService : IEmailService
 {

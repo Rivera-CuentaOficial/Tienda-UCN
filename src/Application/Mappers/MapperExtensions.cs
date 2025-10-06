@@ -1,6 +1,6 @@
 using Mapster;
 
-namespace TiendaUCN.Application.Mappers;
+namespace TiendaUCN.src.Application.Mappers;
 
 public class MapperExtensions
 {
@@ -11,6 +11,12 @@ public class MapperExtensions
 
         var productMapper = serviceProvider.GetService<ProductMapper>();
         productMapper?.ConfigureAllMappings();
+
+        var cartMapper = serviceProvider.GetService<CartMapper>();
+        cartMapper?.ConfigureAllMappings();
+
+        var orderMapper = serviceProvider.GetService<OrderMapper>();
+        orderMapper?.ConfigureAllMappings();
 
         TypeAdapterConfig.GlobalSettings.Default.IgnoreNullValues(true);
     }

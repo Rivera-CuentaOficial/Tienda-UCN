@@ -1,13 +1,13 @@
 using Mapster;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Serilog;
-using TiendaUCN.Application.DTOs.AuthResponse;
-using TiendaUCN.Application.Infrastructure.Repositories.Interfaces;
-using TiendaUCN.Application.Services.Interfaces;
-using TiendaUCN.Domain.Models;
-using TiendaUCN.Infrastructure.Repositories.Interfaces;
+using TiendaUCN.src.Application.DTOs.AuthResponse;
+using TiendaUCN.src.Application.Services.Interfaces;
+using TiendaUCN.src.Domain.Models;
+using TiendaUCN.src.Infrastructure.Repositories.Interfaces;
 
-namespace TiendaUCN.Application.Services.Implements;
+
+namespace TiendaUCN.src.Application.Services.Implements;
 
 public class UserService : IUserService
 {
@@ -472,5 +472,9 @@ public class UserService : IUserService
     {
         var digits = new string(phoneNumber.Where(char.IsDigit).ToArray());
         return "+56 " + digits;
+    }
+    public async Task<int> DeleteUnconfirmedAsync()
+    {
+        return await _userRepository.DeleteUnconfirmedAsync();
     }
 }

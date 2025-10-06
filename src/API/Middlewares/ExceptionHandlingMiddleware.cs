@@ -1,9 +1,9 @@
 using Serilog;
 using System.Security;
 using System.Text.Json;
-using TiendaUCN.Application.DTOs.BaseResponse;
+using TiendaUCN.src.Application.DTOs.BaseResponse;
 
-namespace TiendaUCN.API.Middlewares;
+namespace TiendaUCN.src.API.Middlewares;
 
 /// <summary>
 /// Middleware para el manejo de excepciones en la aplicación.

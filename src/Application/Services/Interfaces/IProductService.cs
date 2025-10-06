@@ -1,8 +1,8 @@
-using TiendaUCN.Application.DTOs.ProductResponse;
-using TiendaUCN.Application.DTOs.ProductResponse.Admin;
-using TiendaUCN.Application.DTOs.ProductResponse.Customer;
+using TiendaUCN.src.Application.DTOs.ProductResponse;
+using TiendaUCN.src.Application.DTOs.ProductResponse.Admin;
+using TiendaUCN.src.Application.DTOs.ProductResponse.Customer;
 
-namespace TiendaUCN.Application.Services.Interfaces;
+namespace TiendaUCN.src.Application.Services.Interfaces;
 
 public interface IProductService
 {

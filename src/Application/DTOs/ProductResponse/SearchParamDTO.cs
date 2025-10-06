@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Reflection.Metadata;
 
-namespace TiendaUCN.Application.DTOs.ProductResponse;
+namespace TiendaUCN.src.Application.DTOs.ProductResponse;
 
 public class SearchParamsDTO
 {

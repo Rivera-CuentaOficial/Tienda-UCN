@@ -1,6 +1,7 @@
-using TiendaUCN.Application.DTOs.AuthResponse;
+using TiendaUCN.src.Application.DTOs.AuthResponse;
 
-namespace TiendaUCN.Application.Services.Interfaces
+
+namespace TiendaUCN.src.Application.Services.Interfaces
 {
     public interface IUserService
     {
@@ -14,5 +15,7 @@ namespace TiendaUCN.Application.Services.Interfaces
         );
         Task<string> ChangeUserPasswordByEmailAsync(ResetPasswordDTO resetPasswordDTO);
         string NormalizePhoneNumber(string PhoneNumber);
+        Task<int> DeleteUnconfirmedAsync();
+
     }
 }

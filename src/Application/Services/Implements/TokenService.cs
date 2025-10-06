@@ -2,10 +2,10 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using TiendaUCN.Application.Services.Interfaces;
-using TiendaUCN.Domain.Models;
+using TiendaUCN.src.Application.Services.Interfaces;
+using TiendaUCN.src.Domain.Models;
 
-namespace TiendaUCN.Application.Services.Implements;
+namespace TiendaUCN.src.Application.Services.Implements;
 
 public class TokenService : ITokenService
 {

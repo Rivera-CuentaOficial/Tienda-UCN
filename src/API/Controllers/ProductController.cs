@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TiendaUCN.Application.DTO.BaseResponse;
-using TiendaUCN.Application.DTOs.ProductResponse;
-using TiendaUCN.Application.DTOs.ProductResponse.Admin;
-using TiendaUCN.Application.DTOs.ProductResponse.Customer;
-using TiendaUCN.Application.Services.Interfaces;
+using TiendaUCN.src.Application.DTOs.BaseResponse;
+using TiendaUCN.src.Application.DTOs.ProductResponse;
+using TiendaUCN.src.Application.DTOs.ProductResponse.Admin;
+using TiendaUCN.src.Application.DTOs.ProductResponse.Customer;
+using TiendaUCN.src.Application.Services.Interfaces;
 
-namespace TiendaUCN.API.Controllers;
+namespace TiendaUCN.src.API.Controllers;
 
 public class ProductController : BaseController
 {
