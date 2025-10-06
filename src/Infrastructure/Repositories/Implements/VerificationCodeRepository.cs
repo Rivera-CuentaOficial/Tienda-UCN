@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using TiendaUCN.Domain.Models;
-using TiendaUCN.Infrastructure.Data;
+using TiendaUCN.src.Domain.Models;
+using TiendaUCN.src.Infrastructure.Data;
+using TiendaUCN.src.Infrastructure.Repositories.Interfaces;
 
-namespace TiendaUCN.Infrastructure.Repositories.Interfaces;
+namespace TiendaUCN.src.Infrastructure.Repositories.Implements;
 
 public class VerificationCodeRepository : IVerificationCodeRepository
 {
@@ -76,5 +77,12 @@ public class VerificationCodeRepository : IVerificationCodeRepository
             .OrderByDescending(vc => vc.CreatedAt)
             .FirstOrDefaultAsync();
         return verificationCode!;
+    }
+    public async Task<int> DeleteByUserIdAsync(int userId)
+    {
+        var codes = await _dataContext.VerificationCodes.Where(vc => vc.UserId == userId).ToListAsync();
+        _dataContext.VerificationCodes.RemoveRange(codes);
+        await _dataContext.SaveChangesAsync();
+        return codes.Count;
     }
 }

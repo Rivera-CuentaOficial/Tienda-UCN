@@ -1,4 +1,4 @@
-namespace TiendaUCN.Domain.Models;
+namespace TiendaUCN.src.Domain.Models;
 
 public enum CodeType
 {

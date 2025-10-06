@@ -1,4 +1,4 @@
-namespace TiendaUCN.Application.Services.Interfaces;
+namespace TiendaUCN.src.Application.Services.Interfaces;
 
 public interface IEmailService
 {

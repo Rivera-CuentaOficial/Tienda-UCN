@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace TiendaUCN.Domain.Models;
+namespace TiendaUCN.src.Domain.Models;
 
 public enum Status
 {

@@ -1,6 +1,6 @@
-using TiendaUCN.Domain.Models;
+using TiendaUCN.src.Domain.Models;
 
-namespace TiendaUCN.Infrastructure.Repositories.Interfaces;
+namespace TiendaUCN.src.Infrastructure.Repositories.Interfaces;
 
 public interface IVerificationCodeRepository
 {
@@ -10,4 +10,5 @@ public interface IVerificationCodeRepository
     Task<int> IncreaseAttemptsAsync(int userId, CodeType codeType);
     Task<bool> DeleteByUserIdAsync(int userId, CodeType codeType);
     Task<VerificationCode> GetLatestByUserIdAsync(int userId, CodeType codeType);
+    Task<int> DeleteByUserIdAsync(int userId);
 }

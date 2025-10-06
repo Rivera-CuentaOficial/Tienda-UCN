@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using TiendaUCN.Domain.Models;
+using TiendaUCN.src.Domain.Models;
 
-namespace TiendaUCN.Infrastructure.Data;
+namespace TiendaUCN.src.Infrastructure.Data;
 
 public class DataContext : IdentityDbContext<User, Role, int>
 {

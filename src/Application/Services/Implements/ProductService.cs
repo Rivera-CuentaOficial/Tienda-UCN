@@ -1,13 +1,13 @@
 using Mapster;
 using Serilog;
-using TiendaUCN.Application.DTOs.ProductResponse;
-using TiendaUCN.Application.DTOs.ProductResponse.Admin;
-using TiendaUCN.Application.DTOs.ProductResponse.Customer;
-using TiendaUCN.Application.Infrastructure.Repositories.Interfaces;
-using TiendaUCN.Application.Services.Interfaces;
-using TiendaUCN.Domain.Models;
+using TiendaUCN.src.Application.DTOs.ProductResponse;
+using TiendaUCN.src.Application.DTOs.ProductResponse.Admin;
+using TiendaUCN.src.Application.DTOs.ProductResponse.Customer;
+using TiendaUCN.src.Application.Services.Interfaces;
+using TiendaUCN.src.Domain.Models;
+using TiendaUCN.src.Infrastructure.Repositories.Interfaces;
 
-namespace TiendaUCN.Application.Services.Implements;
+namespace TiendaUCN.src.Application.Services.Implements;
 
 public class ProductService : IProductService
 {

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TiendaUCN.Application.DTOs.ProductResponse;
+namespace TiendaUCN.src.Application.DTOs.ProductResponse;
 
 public class CreateProductDTO
 {

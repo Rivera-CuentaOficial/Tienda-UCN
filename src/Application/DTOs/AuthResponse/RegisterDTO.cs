@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using TiendaUCN.Application.Validators;
+using TiendaUCN.src.Application.Validators;
 
-namespace TiendaUCN.Application.DTOs.AuthResponse;
+namespace TiendaUCN.src.Application.DTOs.AuthResponse;
 
 public class RegisterDTO
 {

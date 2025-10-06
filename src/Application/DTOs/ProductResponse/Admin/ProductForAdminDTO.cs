@@ -1,4 +1,4 @@
-namespace TiendaUCN.Application.DTOs.ProductResponse.Admin;
+namespace TiendaUCN.src.Application.DTOs.ProductResponse.Admin;
 
 public class ProductForAdminDTO
 {

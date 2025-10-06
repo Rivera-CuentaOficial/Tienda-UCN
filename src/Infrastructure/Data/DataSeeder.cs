@@ -2,8 +2,8 @@ using Bogus;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using TiendaUCN.Domain.Models;
-using TiendaUCN.Infrastructure.Data;
+using TiendaUCN.src.Domain.Models;
+using TiendaUCN.src.Infrastructure.Data;
 
 public class DataSeeder
 {

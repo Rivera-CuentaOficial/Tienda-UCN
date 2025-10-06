@@ -1,8 +1,8 @@
 using Mapster;
-using TiendaUCN.Application.DTOs.AuthResponse;
-using TiendaUCN.Domain.Models;
+using TiendaUCN.src.Application.DTOs.AuthResponse;
+using TiendaUCN.src.Domain.Models;
 
-namespace TiendaUCN.Application.Mappers;
+namespace TiendaUCN.src.Application.Mappers;
 
 public class UserMapper
 {

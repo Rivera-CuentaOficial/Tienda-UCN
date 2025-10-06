@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using TiendaUCN.API.Controllers;
-using TiendaUCN.Application.DTO.BaseResponse;
-using TiendaUCN.Application.DTOs.AuthResponse;
-using TiendaUCN.Application.Services.Interfaces;
+using TiendaUCN.src.API.Controllers;
+using TiendaUCN.src.Application.DTOs.AuthResponse;
+using TiendaUCN.src.Application.DTOs.BaseResponse;
+using TiendaUCN.src.Application.Services.Interfaces;
 
 public class AuthController(IUserService userService) : BaseController
 {

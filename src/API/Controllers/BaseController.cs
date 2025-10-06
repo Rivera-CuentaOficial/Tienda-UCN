@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace TiendaUCN.API.Controllers;
+namespace TiendaUCN.src.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

@@ -1,10 +1,10 @@
 using Mapster;
-using TiendaUCN.Application.DTOs.ProductResponse;
-using TiendaUCN.Application.DTOs.ProductResponse.Admin;
-using TiendaUCN.Application.DTOs.ProductResponse.Customer;
-using TiendaUCN.Domain.Models;
+using TiendaUCN.src.Application.DTOs.ProductResponse;
+using TiendaUCN.src.Application.DTOs.ProductResponse.Admin;
+using TiendaUCN.src.Application.DTOs.ProductResponse.Customer;
+using TiendaUCN.src.Domain.Models;
 
-namespace TiendaUCN.Application.Mappers;
+namespace TiendaUCN.src.Application.Mappers;
 
 public class ProductMapper
 {
