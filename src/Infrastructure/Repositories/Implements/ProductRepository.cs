@@ -164,4 +164,13 @@ public class ProductRepository : IProductRepository
             .Products.Where(p => p.Id == id)
             .ExecuteUpdateAsync(p => p.SetProperty(p => p.IsAvailable, p => !p.IsAvailable));
     }
+
+    public async Task<int> GetRealStockAsync(int productId)
+    {
+        return await _context
+            .Products.AsNoTracking()
+            .Where(p => p.Id == productId)
+            .Select(p => p.Stock)
+            .FirstOrDefaultAsync();
+    }
 }

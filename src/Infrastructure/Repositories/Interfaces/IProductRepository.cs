@@ -17,4 +17,5 @@ public interface IProductRepository
     Task<Product?> GetByIdAsync(int id);
     Task<Product?> GetByIdForAdminAsync(int id);
     Task ToggleActiveAsync(int id);
+    Task<int> GetRealStockAsync(int productId);
 }

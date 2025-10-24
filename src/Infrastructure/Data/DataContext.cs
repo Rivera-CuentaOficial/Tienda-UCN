@@ -14,4 +14,6 @@ public class DataContext : IdentityDbContext<User, Role, int>
     public DbSet<Category> Categories { get; set; }
     public DbSet<Brand> Brands { get; set; }
     public DbSet<Image> Images { get; set; }
+    public DbSet<Cart> Carts { get; set; } = null!;
+    public DbSet<CartItem> CartItems { get; set; } = null!;
 }
