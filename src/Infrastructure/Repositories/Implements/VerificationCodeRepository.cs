@@ -78,9 +78,12 @@ public class VerificationCodeRepository : IVerificationCodeRepository
             .FirstOrDefaultAsync();
         return verificationCode!;
     }
+
     public async Task<int> DeleteByUserIdAsync(int userId)
     {
-        var codes = await _dataContext.VerificationCodes.Where(vc => vc.UserId == userId).ToListAsync();
+        var codes = await _dataContext
+            .VerificationCodes.Where(vc => vc.UserId == userId)
+            .ToListAsync();
         _dataContext.VerificationCodes.RemoveRange(codes);
         await _dataContext.SaveChangesAsync();
         return codes.Count;

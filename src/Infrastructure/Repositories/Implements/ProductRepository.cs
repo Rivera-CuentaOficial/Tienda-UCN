@@ -173,4 +173,13 @@ public class ProductRepository : IProductRepository
             .Select(p => p.Stock)
             .FirstOrDefaultAsync();
     }
+
+    public async Task UpdateStockAsync(int productId, int stock)
+    {
+        Product? product =
+            await _context.Products.FindAsync(productId)
+            ?? throw new KeyNotFoundException("Producto no encontrado");
+        product.Stock = stock;
+        await _context.SaveChangesAsync();
+    }
 }
