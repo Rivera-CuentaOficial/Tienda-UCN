@@ -5,7 +5,6 @@ using TiendaUCN.src.Domain.Models;
 using TiendaUCN.src.Infrastructure.Data;
 using TiendaUCN.src.Infrastructure.Repositories.Interfaces;
 
-
 namespace TiendaUCN.src.Infrastructure.Repositories.Implements;
 
 public class UserRepository : IUserRepository
@@ -15,20 +14,27 @@ public class UserRepository : IUserRepository
     private readonly IVerificationCodeRepository _verificationCodeRepository;
     private readonly int _daysOfDeleteUnconfirmedUsers;
 
-    public UserRepository(DataContext dataContext, UserManager<User> userManager, IVerificationCodeRepository verificationCodeRepository, IConfiguration configuration)
+    public UserRepository(
+        DataContext dataContext,
+        UserManager<User> userManager,
+        IVerificationCodeRepository verificationCodeRepository,
+        IConfiguration configuration
+    )
     {
-
-
         _context = dataContext;
         _userManager = userManager;
         _verificationCodeRepository = verificationCodeRepository;
-        _daysOfDeleteUnconfirmedUsers = configuration.GetValue<int?>("Jobs:DaysOfDeleteUnconfirmedUsers") ?? throw new InvalidOperationException("La configuración 'Jobs:DaysOfDeleteUnconfirmedUsers' no está definida.");
-
+        _daysOfDeleteUnconfirmedUsers =
+            configuration.GetValue<int?>("Jobs:DaysOfDeleteUnconfirmedUsers")
+            ?? throw new InvalidOperationException(
+                "La configuración 'Jobs:DaysOfDeleteUnconfirmedUsers' no está definida."
+            );
     }
 
     public async Task<User> GetByEmailAsync(string email)
     {
-        return await _userManager.FindByEmailAsync(email);
+        User? user = await _userManager.FindByEmailAsync(email);
+        return user!;
     }
 
     public async Task<bool> CheckPasswordAsync(User user, string password)
@@ -94,14 +100,15 @@ public class UserRepository : IUserRepository
         var result = await _userManager.DeleteAsync(user!);
         return result.Succeeded;
     }
+
     public async Task<int> DeleteUnconfirmedAsync()
     {
         Log.Information("Iniciando eliminación de usuarios no confirmados");
 
         var cutoffDate = DateTime.UtcNow.AddDays(_daysOfDeleteUnconfirmedUsers);
 
-        var unconfirmedUsers = await _context.Users
-            .Where(u => !u.EmailConfirmed && u.RegisteredAt < cutoffDate)
+        var unconfirmedUsers = await _context
+            .Users.Where(u => !u.EmailConfirmed && u.RegisteredAt < cutoffDate)
             .Include(u => u.VerificationCodes)
             .ToListAsync();
 
@@ -125,6 +132,7 @@ public class UserRepository : IUserRepository
         Log.Information($"Eliminados {unconfirmedUsers.Count} usuarios no confirmados");
         return unconfirmedUsers.Count;
     }
+
     public async Task<User?> GetByIdAsync(int id)
     {
         return await _userManager.FindByIdAsync(id.ToString());
