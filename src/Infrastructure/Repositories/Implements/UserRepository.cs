@@ -69,6 +69,19 @@ public class UserRepository : IUserRepository
         return false;
     }
 
+    public async Task<bool> UpdateAsync(User user)
+    {
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            Log.Error(
+                "Error al actualizar el usuario: {Errors}",
+                string.Join(", ", result.Errors.Select(e => e.Description))
+            );
+        }
+        return result.Succeeded;
+    }
+
     public async Task<bool> ConfirmEmailAsync(string email)
     {
         var result = await _context

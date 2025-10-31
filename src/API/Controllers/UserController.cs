@@ -41,5 +41,26 @@ namespace TiendaUCN.src.API.Controllers
                 )
             );
         }
+
+        [HttpPut("profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUserProfileAsync(
+            [FromBody] UpdateProfileDTO updateProfileDTO
+        )
+        {
+            var userId =
+                (
+                    User.Identity?.IsAuthenticated == true
+                        ? User
+                            .Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)
+                            ?.Value
+                        : null
+                ) ?? throw new UnauthorizedAccessException("Usuario no autenticado.");
+            int.TryParse(userId, out int parsedUserId);
+            var result = await _userService.UpdateUserProfileAsync(parsedUserId, updateProfileDTO);
+            return Ok(
+                new GenericResponse<string>("Perfil de usuario actualizado exitosamente", result)
+            );
+        }
     }
 }

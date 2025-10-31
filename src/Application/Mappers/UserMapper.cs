@@ -11,6 +11,7 @@ public class UserMapper
     {
         ConfigureAuthMapping();
         ConfigureProfileMapping();
+        ConfigureUpdateProfileMapping();
     }
 
     public static void ConfigureAuthMapping()
@@ -38,6 +39,21 @@ public class UserMapper
             .Map(dest => dest.BirthDate, src => src.BirthDate)
             .Map(dest => dest.Rut, src => src.Rut)
             .Map(dest => dest.Email, src => src.Email)
+            .Map(dest => dest.PhoneNumber, src => src.PhoneNumber);
+    }
+
+    public static void ConfigureUpdateProfileMapping()
+    {
+        TypeAdapterConfig<UpdateProfileDTO, User>
+            .NewConfig()
+            .IgnoreNullValues(true)
+            .Ignore(dest => dest.Email!)
+            .Map(dest => dest.FirstName, src => src.FirstName)
+            .Map(dest => dest.LastName, src => src.LastName)
+            .Map(dest => dest.Gender, src => src.Gender)
+            .Map(dest => dest.BirthDate, src => src.BirthDate)
+            .Map(dest => dest.Rut, src => src.Rut)
+            .Map(dest => dest.PendingEmail, src => src.Email)
             .Map(dest => dest.PhoneNumber, src => src.PhoneNumber);
     }
 }
