@@ -42,6 +42,25 @@ public class EmailService : IEmailService
         await _resend.EmailSendAsync(message);
     }
 
+    public async Task SendChangeEmailVerificationCodeAsync(string email, string code)
+    {
+        var htmlBody = await LoadTemplate("ChangeEmail", code);
+        var message = new EmailMessage
+        {
+            From =
+                _configuration.GetValue<string>("EmailConfiguration:From")
+                ?? throw new InvalidOperationException("Email 'From' no esta configurado."),
+            To = email,
+            Subject =
+                _configuration.GetValue<string>("EmailConfiguration:ChangeEmailSubject")
+                ?? throw new InvalidOperationException(
+                    "Email 'ChangeEmailSubject' no esta configurado."
+                ),
+            HtmlBody = htmlBody,
+        };
+        await _resend.EmailSendAsync(message);
+    }
+
     public async Task SendWelcomeEmailAsync(string email)
     {
         var htmlBody = await LoadTemplate("Welcome", null);

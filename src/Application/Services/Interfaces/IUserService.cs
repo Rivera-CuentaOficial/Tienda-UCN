@@ -17,5 +17,6 @@ namespace TiendaUCN.src.Application.Services.Interfaces
         string NormalizePhoneNumber(string PhoneNumber);
         Task<int> DeleteUnconfirmedAsync();
         Task<ViewUserProfileDTO> GetUserProfileAsync(int userId);
+        Task<string> UpdateUserProfileAsync(int userId, UpdateProfileDTO updateProfileDTO);
     }
 }

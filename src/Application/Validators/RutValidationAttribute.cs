@@ -39,7 +39,14 @@ public class RutValidationAttribute : ValidationAttribute
             {
                 return ValidationResult.Success;
             }
+            else
+            {
+                return new ValidationResult("El Rut no es válido.");
+            }
         }
-        return new ValidationResult("El Rut no es válido.");
+        else
+        {
+            return ValidationResult.Success;
+        }
     }
 }

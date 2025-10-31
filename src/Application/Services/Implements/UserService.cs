@@ -43,6 +43,14 @@ public class UserService : IUserService
         );
     }
 
+    /// <summary>
+    /// Inicia sesión de un usuario y genera un token JWT.
+    /// </summary>
+    /// <param name="loginDTO">Datos de inicio de sesión del usuario.</param>
+    /// <param name="httpContext">Contexto HTTP de la solicitud.</param>
+    /// <returns>Token JWT del usuario.</returns>
+    /// <exception cref="UnauthorizedAccessException">Credenciales inválidas.</exception>
+    /// <exception cref="InvalidOperationException">El correo electrónico no ha sido confirmado.</exception>
     public async Task<string> LoginAsync(LoginDTO loginDTO, HttpContext httpContext)
     {
         var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "IP desconocida";
@@ -88,6 +96,14 @@ public class UserService : IUserService
         return _tokenService.CreateToken(user, roleName, loginDTO.RememberMe);
     }
 
+    /// <summary>
+    /// Registra un nuevo usuario.
+    /// </summary>
+    /// <param name="registerDTO">Datos de registro del nuevo usuario.</param>
+    /// <param name="httpContext">Contexto HTTP de la solicitud.</param>
+    /// <returns>Mensaje de éxito o error.</returns>
+    /// <exception cref="InvalidOperationException">El correo electrónico o RUT ya están registrados.</exception>
+    /// <exception cref="Exception">Error al registrar el usuario.</exception>
     public async Task<string> RegisterAsync(RegisterDTO registerDTO, HttpContext httpContext)
     {
         var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "IP desconocida";
@@ -163,6 +179,16 @@ public class UserService : IUserService
         return "Usuario registrado exitosamente. Por favor, verifica tu correo electrónico.";
     }
 
+    /// <summary>
+    /// Verifica el correo electrónico de un usuario.
+    /// </summary>
+    /// <param name="verifyDTO">Datos de verificación del usuario.</param>
+    /// <param name="httpContext">Contexto HTTP de la solicitud.</param>
+    /// <returns>Mensaje de éxito o error.</returns>
+    /// <exception cref="KeyNotFoundException">El usuario no fue encontrado.</exception>
+    /// <exception cref="InvalidOperationException">El correo electrónico no ha sido confirmado.</exception>
+    /// <exception cref="ArgumentException">El código de verificación es inválido.</exception>
+    /// <exception cref="Exception">Error al verificar el correo electrónico.</exception>
     public async Task<string> VerifyEmailAsync(VerifyDTO verifyDTO, HttpContext httpContext)
     {
         User? user = await _userRepository.GetByEmailAsync(verifyDTO.Email);
@@ -272,6 +298,14 @@ public class UserService : IUserService
         throw new Exception("Error al verificar el correo electrónico.");
     }
 
+    /// <summary>
+    /// Reenvía el código de verificación al correo electrónico del usuario.
+    /// </summary>
+    /// <param name="resendVerifyDTO">Datos del usuario para reenviar el código.</param>
+    /// <returns>Mensaje de éxito o error.</returns>
+    /// <exception cref="KeyNotFoundException">El usuario no existe.</exception>
+    /// <exception cref="InvalidOperationException">El correo electrónico ya ha sido verificado.</exception>
+    /// <exception cref="TimeoutException">Ha pedido un nuevo código de verificación muchas veces en un corto período.</exception>
     public async Task<string> ResendVerifyEmail(ResendVerifyDTO resendVerifyDTO)
     {
         var currentTime = DateTime.UtcNow;
@@ -369,6 +403,14 @@ public class UserService : IUserService
         return "Codigo de recuperacion enviado exitosamente.";
     }
 
+    /// <summary>
+    /// Cambia la contraseña de un usuario mediante su correo electrónico.
+    /// </summary>
+    /// <param name="resetPasswordDTO">Datos del usuario para restablecer la contraseña.</param>
+    /// <returns>Mensaje de éxito o error.</returns>
+    /// <exception cref="KeyNotFoundException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="ArgumentException"></exception>
     public async Task<string> ChangeUserPasswordByEmailAsync(ResetPasswordDTO resetPasswordDTO)
     {
         User? user = await _userRepository.GetByEmailAsync(resetPasswordDTO.Email);
@@ -475,7 +517,7 @@ public class UserService : IUserService
     public string NormalizePhoneNumber(string phoneNumber)
     {
         var digits = new string(phoneNumber.Where(char.IsDigit).ToArray());
-        return "+56 " + digits;
+        return "+569 " + digits;
     }
 
     /// <summary>
@@ -501,5 +543,72 @@ public class UserService : IUserService
             ?? throw new KeyNotFoundException("Usuario no encontrado.");
         Log.Information("Perfil de usuario obtenido para el usuario ID: {UserId}", userId);
         return user.Adapt<ViewUserProfileDTO>();
+    }
+
+    public async Task<string> UpdateUserProfileAsync(int userId, UpdateProfileDTO updateProfileDTO)
+    {
+        Log.Information("Actualizando perfil de usuario para el usuario ID: {UserId}", userId);
+        User? user =
+            await _userRepository.GetByIdAsync(userId)
+            ?? throw new KeyNotFoundException("Usuario no encontrado.");
+        if (updateProfileDTO.Email != null)
+        {
+            if (updateProfileDTO.Email == user.Email)
+            {
+                throw new InvalidOperationException(
+                    "El nuevo correo electrónico no puede ser igual al actual."
+                );
+            }
+            bool emailExists = await _userRepository.ExistsByEmailAsync(updateProfileDTO.Email);
+            if (emailExists)
+            {
+                throw new InvalidOperationException("El correo electrónico ya está en uso.");
+            }
+            string verificationCode = new Random().Next(100000, 999999).ToString();
+            VerificationCode code = new VerificationCode
+            {
+                Type = CodeType.EmailVerification,
+                Code = verificationCode,
+                Expiration = DateTime.UtcNow.AddMinutes(_verificationCodeExpirationInMinutes),
+                UserId = user.Id,
+            };
+            Log.Information(
+                "Codigo de verificacion generado para cambio de email para el usuario ID: {UserId}.",
+                user.Id
+            );
+            var newEmailVerificationCode = await _verificationCodeRepository.CreateAsync(code);
+            await _emailService.SendChangeEmailVerificationCodeAsync(
+                updateProfileDTO.Email,
+                newEmailVerificationCode.Code
+            );
+            Log.Information(
+                "Correo de verificacion enviado para cambio de email para el usuario ID: {UserId}.",
+                user.Id
+            );
+        }
+        if (updateProfileDTO.Rut != null)
+        {
+            if (updateProfileDTO.Rut == user.Rut)
+            {
+                throw new InvalidOperationException("El nuevo RUT no puede ser igual al actual.");
+            }
+            bool rutExists = await _userRepository.ExistsByRutAsync(updateProfileDTO.Rut);
+            if (rutExists)
+            {
+                throw new InvalidOperationException("El RUT ya está en uso.");
+            }
+        }
+        updateProfileDTO.Adapt(user);
+
+        bool updateResult = await _userRepository.UpdateAsync(user);
+        if (!updateResult)
+        {
+            Log.Error(
+                "Error al actualizar el perfil de usuario para el usuario ID: {UserId}",
+                userId
+            );
+            throw new Exception("Error al actualizar el perfil de usuario.");
+        }
+        return "Perfil de usuario actualizado exitosamente.";
     }
 }
