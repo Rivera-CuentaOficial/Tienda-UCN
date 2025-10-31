@@ -1,5 +1,5 @@
 using TiendaUCN.src.Application.DTOs.AuthResponse;
-
+using TiendaUCN.src.Application.DTOs.UserResponse;
 
 namespace TiendaUCN.src.Application.Services.Interfaces
 {
@@ -16,6 +16,6 @@ namespace TiendaUCN.src.Application.Services.Interfaces
         Task<string> ChangeUserPasswordByEmailAsync(ResetPasswordDTO resetPasswordDTO);
         string NormalizePhoneNumber(string PhoneNumber);
         Task<int> DeleteUnconfirmedAsync();
-
+        Task<ViewUserProfileDTO> GetUserProfileAsync(int userId);
     }
 }
