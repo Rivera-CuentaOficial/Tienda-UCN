@@ -1,11 +1,10 @@
 using Mapster;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Serilog;
 using TiendaUCN.src.Application.DTOs.AuthResponse;
+using TiendaUCN.src.Application.DTOs.UserResponse;
 using TiendaUCN.src.Application.Services.Interfaces;
 using TiendaUCN.src.Domain.Models;
 using TiendaUCN.src.Infrastructure.Repositories.Interfaces;
-
 
 namespace TiendaUCN.src.Application.Services.Implements;
 
@@ -468,13 +467,39 @@ public class UserService : IUserService
         return "Se ha reseteado la contraseña correctamente";
     }
 
+    /// <summary>
+    /// Normaliza un número de teléfono al formato internacional chileno.
+    /// </summary>
+    /// <param name="phoneNumber"></param>
+    /// <returns>El número de teléfono normalizado.</returns>
     public string NormalizePhoneNumber(string phoneNumber)
     {
         var digits = new string(phoneNumber.Where(char.IsDigit).ToArray());
         return "+56 " + digits;
     }
+
+    /// <summary>
+    /// Elimina los usuarios no confirmados.
+    /// </summary>
+    /// <returns>El número de usuarios eliminados.</returns>
     public async Task<int> DeleteUnconfirmedAsync()
     {
         return await _userRepository.DeleteUnconfirmedAsync();
+    }
+
+    /// <summary>
+    /// Obtiene el perfil de un usuario por su ID.
+    /// </summary>
+    /// <param name="userId">Id del usuario</param>
+    /// <returns>Datos del perfil del usuario</returns>
+    /// <exception cref="KeyNotFoundException"></exception>
+    public async Task<ViewUserProfileDTO> GetUserProfileAsync(int userId)
+    {
+        Log.Information("Obteniendo perfil de usuario para el usuario ID: {UserId}", userId);
+        User? user =
+            await _userRepository.GetByIdAsync(userId)
+            ?? throw new KeyNotFoundException("Usuario no encontrado.");
+        Log.Information("Perfil de usuario obtenido para el usuario ID: {UserId}", userId);
+        return user.Adapt<ViewUserProfileDTO>();
     }
 }
