@@ -14,6 +14,7 @@ namespace TiendaUCN.src.Application.Services.Interfaces
             HttpContext httpContext
         );
         Task<string> ChangeUserPasswordByEmailAsync(ResetPasswordDTO resetPasswordDTO);
+        Task<string> ChangeUserPasswordAsync(string token, int userId, DateTime tokenExpiration, ChangePasswordDTO changePasswordDTO);
         string NormalizePhoneNumber(string PhoneNumber);
         Task<int> DeleteUnconfirmedAsync();
         Task<ViewUserProfileDTO> GetUserProfileAsync(int userId);
