@@ -356,6 +356,14 @@ public class UserService : IUserService
         return "Se ha reenviado un nuevo código de verificación a su correo electrónico.";
     }
 
+    /// <summary>
+    /// Envía un correo de recuperación de contraseña al usuario.
+    /// </summary>
+    /// <param name="recoverPasswordDTO">Datos del usuario para recuperar la contraseña.</param>
+    /// <param name="httpContext">Contexto HTTP de la solicitud.</param>
+    /// <returns>Mensaje de éxito o error.</returns>
+    /// <exception cref="KeyNotFoundException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
     public async Task<string> SendPasswordRecoveryEmail(
         RecoverPasswordDTO recoverPasswordDTO,
         HttpContext httpContext
@@ -509,6 +517,44 @@ public class UserService : IUserService
         return "Se ha reseteado la contraseña correctamente";
     }
 
+    public async Task<string> ChangeUserPasswordAsync(
+        string token,
+        int userId,
+        DateTime expiration,
+        ChangePasswordDTO changePasswordDTO
+    )
+    {
+        User user =
+            await _userRepository.GetByIdAsync(userId)
+            ?? throw new KeyNotFoundException("Usuario no encontrado.");
+        var isPsswordValid = await _userRepository.CheckPasswordAsync(
+            user,
+            changePasswordDTO.CurrentPassword
+        );
+        if (!isPsswordValid)
+        {
+            Log.Warning($"La contraseña actual es incorrecta para el usuario ID: {userId}");
+            throw new InvalidOperationException("La contraseña actual es incorrecta.");
+        }
+        bool changePassword = await _userRepository.ChangeUserPasswordAsync(
+            user,
+            changePasswordDTO.NewPassword
+        );
+        if (!changePassword)
+        {
+            Log.Warning($"No se pudo actualizar la contraseña para el usuario ID: {userId}");
+            throw new InvalidOperationException("No se pudo actualizar la contraseña.");
+        }
+        Log.Information($"Contraseña actualizada para el usuario ID: {userId}", userId);
+        var blacklistToken = await _tokenService.AddTokenToBlacklist(token, userId, expiration);
+        if (!blacklistToken)
+        {
+            Log.Warning($"No se pudieron invalidar los tokens para el usuario ID: {userId}");
+            throw new InvalidOperationException("No se pudieron invalidar los tokens.");
+        }
+        return "Contraseña cambiada exitosamente.";
+    }
+
     /// <summary>
     /// Normaliza un número de teléfono al formato internacional chileno.
     /// </summary>
@@ -545,6 +591,15 @@ public class UserService : IUserService
         return user.Adapt<ViewUserProfileDTO>();
     }
 
+    /// <summary>
+    /// Actualiza el perfil de un usuario.
+    /// </summary>
+    /// <param name="userId">ID del usuario a actualizar</param>
+    /// <param name="updateProfileDTO">Datos a actualizar</param>
+    /// <returns>Mensaje de éxito</returns>
+    /// <exception cref="KeyNotFoundException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="Exception"></exception>
     public async Task<string> UpdateUserProfileAsync(int userId, UpdateProfileDTO updateProfileDTO)
     {
         Log.Information("Actualizando perfil de usuario para el usuario ID: {UserId}", userId);

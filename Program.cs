@@ -30,7 +30,6 @@ builder.Services.AddScoped<CartMapper>();
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -44,6 +43,8 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IBlacklistedTokensRepository, BlacklistedTokensRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 #region Email Service Configuration
 builder.Services.AddOptions();
@@ -200,6 +201,7 @@ using (var scope = app.Services.CreateScope())
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<CartMiddleware>();
+app.UseMiddleware<TokenBlacklistMiddleware>();
 
 app.MapOpenApi();
 app.MapControllers();
