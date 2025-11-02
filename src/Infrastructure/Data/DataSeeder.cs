@@ -44,11 +44,92 @@ namespace TiendaUCN.src.Infrastructure.Data
                 }
                 if (!context.Users.Any())
                 {
+                    // Creación del usuario cliente
                     var customerRole = await context.Roles.FirstOrDefaultAsync(r =>
                         r.Name == "Customer"
                     );
-                    var adminRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == "Admin");
+                    User customerUser = new User
+                    {
+                        FirstName =
+                            configuration["User:CustomerUser:FirstName"]
+                            ?? throw new InvalidOperationException(
+                                "El nombre del usuario cliente no está configurado."
+                            ),
+                        LastName =
+                            configuration["User:CustomerUser:LastName"]
+                            ?? throw new InvalidOperationException(
+                                "El apellido del usuario cliente no está configurado."
+                            ),
+                        Email =
+                            configuration["User:CustomerUser:Email"]
+                            ?? throw new InvalidOperationException(
+                                "El email del usuario cliente no está configurado."
+                            ),
+                        EmailConfirmed = true,
+                        Gender = Gender.Femenino,
+                        Rut =
+                            configuration["User:CustomerUser:Rut"]
+                            ?? throw new InvalidOperationException(
+                                "El RUT del usuario cliente no está configurado."
+                            ),
+                        BirthDate = DateTime.Parse(
+                            configuration["User:CustomerUser:BirthDate"]
+                                ?? throw new InvalidOperationException(
+                                    "La fecha de nacimiento del usuario cliente no está configurada."
+                                )),
+                        PhoneNumber =
+                            configuration["User:CustomerUser:PhoneNumber"]
+                            ?? throw new InvalidOperationException(
+                                "El número de teléfono del usuario cliente no está configurado."
+                            ),
+                        Status = UserStatus.Active
+                    };
 
+                    customerUser.UserName = customerUser.Email;
+                    var customerPassword =
+                        configuration["User:CustomerUser:Password"]
+                        ?? throw new InvalidOperationException(
+                            "La contraseña del usuario cliente no está configurada."
+                        );
+                    var customerResult = await userManager.CreateAsync(customerUser, customerPassword);
+                    if (customerResult.Succeeded)
+                    {
+                        if (customerRole == null || string.IsNullOrEmpty(customerRole.Name))
+                        {
+                            Log.Error("El rol 'Customer' no existe o no tiene nombre.");
+                            throw new InvalidOperationException(
+                                "El rol 'Customer' no existe o no tiene nombre."
+                            );
+                        }
+                        var roleResult = await userManager.AddToRoleAsync(
+                            customerUser,
+                            customerRole.Name!
+                        );
+                        if (!roleResult.Succeeded)
+                        {
+                            Log.Error(
+                                "Error asignando rol de cliente: {Errors}",
+                                string.Join(", ", roleResult.Errors.Select(e => e.Description))
+                            );
+                            throw new InvalidOperationException(
+                                "No se pudo asignar el rol de cliente al usuario."
+                            );
+                        }
+                        Log.Information("Usuario cliente creado con éxito.");
+                    }
+                    else
+                    {
+                        Log.Error(
+                            "Error creando usuario cliente: {Errors}",
+                            string.Join(", ", customerResult.Errors.Select(e => e.Description))
+                        );
+                        throw new InvalidOperationException(
+                            "No se pudo crear el usuario cliente."
+                        );
+                    }
+
+                    // Creación del usuario administrador
+                    var adminRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == "Admin");
                     User adminUser = new User
                     {
                         FirstName =
@@ -128,6 +209,7 @@ namespace TiendaUCN.src.Infrastructure.Data
                             "No se pudo crear el usuario administrador."
                         );
                     }
+
                     // Creación de usuarios aleatorios
                     var randomPassword =
                         configuration["User:RandomUserPassword"]
