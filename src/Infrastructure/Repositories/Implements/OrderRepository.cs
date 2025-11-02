@@ -81,9 +81,9 @@ namespace TiendaUCN.src.Infrastructure.Repositories.Implements
                 .Orders.AsNoTracking()
                 .Include(or => or.OrderItems)
                 .Where(or => or.UserId == userId);
-            var totalCount = await query.CountAsync();
+
             string searchTerm = searchParams.SearchTerm?.Trim().ToLower() ?? string.Empty;
-            if (!string.IsNullOrWhiteSpace(searchParams.SearchTerm))
+            /*if (!string.IsNullOrWhiteSpace(searchParams.SearchTerm))
             {
                 query = query.Where(or =>
                     or.Code.Contains(searchTerm)
@@ -94,8 +94,12 @@ namespace TiendaUCN.src.Infrastructure.Repositories.Implements
                         )
                     )
                 );
-            }
+            }*/
+
+            var totalCount = await query.CountAsync();
+
             query = query
+                .OrderByDescending(o => o.CreatedAt)
                 .Skip((searchParams.PageNumber - 1) * searchParams.PageSize ?? _defaultPageSize)
                 .Take(searchParams.PageSize ?? _defaultPageSize);
             return (await query.ToListAsync(), totalCount);

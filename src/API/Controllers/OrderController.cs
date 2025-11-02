@@ -8,11 +8,11 @@ using TiendaUCN.src.Application.Services.Interfaces;
 
 namespace TiendaUCN.src.API.Controllers
 {
-    public class OrderController : BaseController
+    public class OrdersController : BaseController
     {
         private readonly IOrderService _orderService;
 
-        public OrderController(IOrderService orderService)
+        public OrdersController(IOrderService orderService)
         {
             _orderService = orderService;
         }
@@ -21,7 +21,7 @@ namespace TiendaUCN.src.API.Controllers
         /// Crea una nueva orden.
         /// </summary>
         /// <returns>Detalles de la orden creada.</returns>
-        [HttpPost("create")]
+        [HttpPost("")]
         [Authorize(Roles = "Customer")]
         public async Task<IActionResult> CreateOrder()
         {
@@ -46,7 +46,7 @@ namespace TiendaUCN.src.API.Controllers
         /// </summary>
         /// <param name="orderCode">Código de la orden</param>
         /// <returns>Detalles de la orden encontrada.</returns>
-        [HttpGet("detail/{orderCode}")]
+        [HttpGet("{orderCode}")]
         [Authorize(Roles = "Customer")]
         public async Task<IActionResult> GetOrderDetail(string orderCode)
         {
@@ -64,7 +64,7 @@ namespace TiendaUCN.src.API.Controllers
         /// </summary>
         /// <param name="searchParams">Parámetros de búsqueda</param>
         /// <returns>Órdenes del usuario.</returns>
-        [HttpGet("user-orders")]
+        [HttpGet("")]
         [Authorize(Roles = "Customer")]
         public async Task<IActionResult> GetUserOrders([FromQuery] SearchParamsDTO searchParams)
         {

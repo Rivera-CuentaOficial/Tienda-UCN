@@ -804,6 +804,16 @@ public class UserService : IUserService
         return "Estado del usuario actualizado exitosamente.";
     }
 
+    /// <summary>
+    /// Actualiza el rol de un usuario.
+    /// </summary>
+    /// <param name="adminId">ID del administrador que realiza el cambio.</param>
+    /// <param name="userId">ID del usuario cuyo rol se va a actualizar.</param>
+    /// <param name="updateUserRoleDTO">Objeto que contiene la información del nuevo rol.</param>
+    /// <returns>Un mensaje indicando el resultado de la operación.</returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="KeyNotFoundException"></exception>
+    /// <exception cref="Exception"></exception>
     public async Task<string> UpdateUserRoleAsync(int adminId, int userId, UpdateUserRoleDTO updateUserRoleDTO)
     {
         var notLastAdmin = await _userRepository.HasAdminsAsync();

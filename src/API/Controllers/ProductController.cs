@@ -8,11 +8,11 @@ using TiendaUCN.src.Application.Services.Interfaces;
 
 namespace TiendaUCN.src.API.Controllers;
 
-public class ProductController : BaseController
+public class ProductsController : BaseController
 {
     private readonly IProductService _productService;
 
-    public ProductController(IProductService productService)
+    public ProductsController(IProductService productService)
     {
         _productService = productService;
     }
@@ -34,7 +34,7 @@ public class ProductController : BaseController
         );
     }
 
-    [HttpGet("customer/products")]
+    [HttpGet("")]
     [AllowAnonymous]
     public async Task<IActionResult> GetAllForCustomerAsync(
         [FromQuery] SearchParamsDTO searchParams
