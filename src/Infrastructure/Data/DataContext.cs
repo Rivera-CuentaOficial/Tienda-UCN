@@ -11,6 +11,7 @@ public class DataContext : IdentityDbContext<User, Role, int>
         : base(options) { }
 
     public DbSet<VerificationCode> VerificationCodes { get; set; }
+    public DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Brand> Brands { get; set; }
@@ -19,4 +20,19 @@ public class DataContext : IdentityDbContext<User, Role, int>
     public DbSet<CartItem> CartItems { get; set; } = null!;
     public DbSet<Order> Orders { get; set; } = null!;
     public DbSet<OrderItem> OrderItems { get; set; } = null!;
+    public DbSet<AuditLog> AuditLogs { get; set; } = null!;
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        builder.Entity<BlacklistedToken>(entity =>
+        {
+            entity.HasIndex(b => b.Token).IsUnique();
+            entity
+                .HasOne(b => b.User)
+                .WithMany()
+                .HasForeignKey(b => b.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
 }

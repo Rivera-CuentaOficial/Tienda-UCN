@@ -36,5 +36,10 @@ namespace TiendaUCN.src.Application.DTOs.UserResponse
         /// Número de teléfono del usuario
         /// </summary>
         public required string PhoneNumber { get; set; }
+
+        /// <summary>
+        /// Fecha último inicio de sesión del usuario
+        /// </summary>
+        public required DateTime LastLoginAt { get; set; }
     }
 }

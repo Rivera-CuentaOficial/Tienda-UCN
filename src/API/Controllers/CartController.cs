@@ -11,7 +11,7 @@ namespace TiendaUCN.src.API.Controllers
     {
         private readonly ICartService _cartService;
 
-        private CartController(ICartService cartService)
+        public CartController(ICartService cartService)
         {
             _cartService = cartService;
         }
@@ -100,7 +100,7 @@ namespace TiendaUCN.src.API.Controllers
         /// </summary>
         /// <param name="changeItemQuantityDTO">Id del item y cantidad nueva</param>
         /// <returns>Resultado con el carrito de compras actualizado.</returns>
-        [HttpPatch("items")]
+        [HttpPut("items")]
         [AllowAnonymous]
         public async Task<IActionResult> UpdateItemQuantity(
             [FromForm] ChangeItemQuantityDTO changeItemQuantityDTO

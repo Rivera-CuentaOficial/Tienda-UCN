@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Reflection.Metadata;
 
 namespace TiendaUCN.src.Application.DTOs.ProductResponse;
 

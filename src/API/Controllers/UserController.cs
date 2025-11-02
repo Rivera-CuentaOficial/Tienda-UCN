@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using System.Security.Claims;
 using TiendaUCN.src.Application.DTOs.BaseResponse;
 using TiendaUCN.src.Application.DTOs.UserResponse;
@@ -40,6 +41,60 @@ namespace TiendaUCN.src.API.Controllers
                     result
                 )
             );
+        }
+
+        [HttpPut("profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUserProfileAsync(
+            [FromBody] UpdateProfileDTO updateProfileDTO
+        )
+        {
+            var userId =
+                (
+                    User.Identity?.IsAuthenticated == true
+                        ? User
+                            .Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)
+                            ?.Value
+                        : null
+                ) ?? throw new UnauthorizedAccessException("Usuario no autenticado.");
+            int.TryParse(userId, out int parsedUserId);
+            var result = await _userService.UpdateUserProfileAsync(parsedUserId, updateProfileDTO);
+            return Ok(
+                new GenericResponse<string>("Perfil de usuario actualizado exitosamente", result)
+            );
+        }
+
+        [HttpPatch("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangeUserPasswordAsync(
+            [FromBody] ChangePasswordDTO changePasswordDTO
+        )
+        {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var userId =
+                (
+                    User.Identity?.IsAuthenticated == true
+                        ? User
+                            .Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)
+                            ?.Value
+                        : null
+                ) ?? throw new UnauthorizedAccessException("Usuario no autenticado.");
+            int.TryParse(userId, out int parsedUserId);
+            var expiration = User.Claims.FirstOrDefault(c => c.Type == "exp")?.Value;
+            Log.Information($"La fecha de expiracion es: {expiration}", expiration);
+            if (!long.TryParse(expiration, out long parsedExpiration))
+            {
+                throw new ArgumentOutOfRangeException("El token no tiene una fecha de expiración válida.");
+            }
+            var expiresAt = DateTimeOffset.FromUnixTimeSeconds(parsedExpiration).UtcDateTime;
+            Log.Information($"La fecha de expiracion parseada es: {expiresAt}", expiresAt);
+            var result = await _userService.ChangeUserPasswordAsync(
+                token,
+                parsedUserId,
+                expiresAt,
+                changePasswordDTO
+            );
+            return Ok(new GenericResponse<string>("Contraseña cambiada exitosamente", result));
         }
     }
 }

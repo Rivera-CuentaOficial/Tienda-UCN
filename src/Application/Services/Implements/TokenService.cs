@@ -4,16 +4,18 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using TiendaUCN.src.Application.Services.Interfaces;
 using TiendaUCN.src.Domain.Models;
+using TiendaUCN.src.Infrastructure.Repositories.Interfaces;
 
 namespace TiendaUCN.src.Application.Services.Implements;
 
 public class TokenService : ITokenService
 {
     private readonly IConfiguration _configuration;
+    private readonly IBlacklistedTokensRepository _blacklistedTokensRepository;
 
     private readonly string _jwtSecret;
 
-    public TokenService(IConfiguration configuration)
+    public TokenService(IConfiguration configuration, IBlacklistedTokensRepository blacklistedTokensRepository)
     {
         _configuration =
             configuration
@@ -21,6 +23,7 @@ public class TokenService : ITokenService
                 nameof(configuration),
                 "La configuración no puede ser nula."
             );
+        _blacklistedTokensRepository = blacklistedTokensRepository;
         _jwtSecret =
             _configuration["JWTSecret"]
             ?? throw new InvalidOperationException("La clave JWTSecret no está configurada.");
@@ -55,5 +58,22 @@ public class TokenService : ITokenService
             Log.Error(ex, "Error creando el token JWT para el usuario {UserId}", user.Id);
             throw new InvalidOperationException("Error creando el token JWT.", ex);
         }
+    }
+
+    public async Task<bool> IsTokenBlacklisted(string token)
+    {
+        return await _blacklistedTokensRepository.IsBlacklistedAsync(token);
+    }
+
+    public async Task<bool> AddTokenToBlacklist(string token, int userId, DateTime expiresAt)
+    {
+        var blacklistedToken = new BlacklistedToken
+        {
+            Token = token,
+            UserId = userId,
+            ExpiresAt = expiresAt
+        };
+
+        return await _blacklistedTokensRepository.AddTokenAsync(blacklistedToken);
     }
 }

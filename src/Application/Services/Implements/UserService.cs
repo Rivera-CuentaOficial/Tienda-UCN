@@ -1,7 +1,10 @@
+using Bogus.DataSets;
 using Mapster;
+using Microsoft.AspNetCore.WebUtilities;
 using Serilog;
 using TiendaUCN.src.Application.DTOs.AuthResponse;
 using TiendaUCN.src.Application.DTOs.UserResponse;
+using TiendaUCN.src.Application.DTOs.UserResponse.AdminDTO;
 using TiendaUCN.src.Application.Services.Interfaces;
 using TiendaUCN.src.Domain.Models;
 using TiendaUCN.src.Infrastructure.Repositories.Interfaces;
@@ -14,8 +17,10 @@ public class UserService : IUserService
     private readonly IUserRepository _userRepository;
     private readonly IEmailService _emailService;
     private readonly IVerificationCodeRepository _verificationCodeRepository;
+    private readonly IAuditLogRepository _auditLogRepository;
     private readonly IConfiguration _configuration;
     private readonly int _verificationCodeExpirationInMinutes;
+    private readonly int _defaultPageSize;
 
     /// <summary>
     /// Inicializa una nueva instancia de la clase <see cref="UserService"/>.
@@ -30,6 +35,7 @@ public class UserService : IUserService
         IUserRepository userRepository,
         IEmailService emailService,
         IVerificationCodeRepository verificationCodeRepository,
+        IAuditLogRepository auditLogRepository,
         IConfiguration configuration
     )
     {
@@ -37,12 +43,22 @@ public class UserService : IUserService
         _userRepository = userRepository;
         _emailService = emailService;
         _verificationCodeRepository = verificationCodeRepository;
+        _auditLogRepository = auditLogRepository;
         _configuration = configuration;
         _verificationCodeExpirationInMinutes = _configuration.GetValue<int>(
             "VerificationCode:ExpirationTimeInMinutes"
         );
+        _defaultPageSize = _configuration.GetValue<int>("Users:DefaultPageSize");
     }
 
+    /// <summary>
+    /// Inicia sesión de un usuario y genera un token JWT.
+    /// </summary>
+    /// <param name="loginDTO">Datos de inicio de sesión del usuario.</param>
+    /// <param name="httpContext">Contexto HTTP de la solicitud.</param>
+    /// <returns>Token JWT del usuario.</returns>
+    /// <exception cref="UnauthorizedAccessException">Credenciales inválidas.</exception>
+    /// <exception cref="InvalidOperationException">El correo electrónico no ha sido confirmado.</exception>
     public async Task<string> LoginAsync(LoginDTO loginDTO, HttpContext httpContext)
     {
         var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "IP desconocida";
@@ -79,6 +95,7 @@ public class UserService : IUserService
         }
         // Obtener el rol del usuario
         var roleName = await _userRepository.GetUserRoleAsync(user);
+        user.LastLoginAt = DateTime.UtcNow;
         // Generar el token JWT
         Log.Information(
             "Inicio de sesión exitoso para el correo {Email} desde la IP {IP}",
@@ -88,6 +105,14 @@ public class UserService : IUserService
         return _tokenService.CreateToken(user, roleName, loginDTO.RememberMe);
     }
 
+    /// <summary>
+    /// Registra un nuevo usuario.
+    /// </summary>
+    /// <param name="registerDTO">Datos de registro del nuevo usuario.</param>
+    /// <param name="httpContext">Contexto HTTP de la solicitud.</param>
+    /// <returns>Mensaje de éxito o error.</returns>
+    /// <exception cref="InvalidOperationException">El correo electrónico o RUT ya están registrados.</exception>
+    /// <exception cref="Exception">Error al registrar el usuario.</exception>
     public async Task<string> RegisterAsync(RegisterDTO registerDTO, HttpContext httpContext)
     {
         var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "IP desconocida";
@@ -163,6 +188,16 @@ public class UserService : IUserService
         return "Usuario registrado exitosamente. Por favor, verifica tu correo electrónico.";
     }
 
+    /// <summary>
+    /// Verifica el correo electrónico de un usuario.
+    /// </summary>
+    /// <param name="verifyDTO">Datos de verificación del usuario.</param>
+    /// <param name="httpContext">Contexto HTTP de la solicitud.</param>
+    /// <returns>Mensaje de éxito o error.</returns>
+    /// <exception cref="KeyNotFoundException">El usuario no fue encontrado.</exception>
+    /// <exception cref="InvalidOperationException">El correo electrónico no ha sido confirmado.</exception>
+    /// <exception cref="ArgumentException">El código de verificación es inválido.</exception>
+    /// <exception cref="Exception">Error al verificar el correo electrónico.</exception>
     public async Task<string> VerifyEmailAsync(VerifyDTO verifyDTO, HttpContext httpContext)
     {
         User? user = await _userRepository.GetByEmailAsync(verifyDTO.Email);
@@ -272,6 +307,14 @@ public class UserService : IUserService
         throw new Exception("Error al verificar el correo electrónico.");
     }
 
+    /// <summary>
+    /// Reenvía el código de verificación al correo electrónico del usuario.
+    /// </summary>
+    /// <param name="resendVerifyDTO">Datos del usuario para reenviar el código.</param>
+    /// <returns>Mensaje de éxito o error.</returns>
+    /// <exception cref="KeyNotFoundException">El usuario no existe.</exception>
+    /// <exception cref="InvalidOperationException">El correo electrónico ya ha sido verificado.</exception>
+    /// <exception cref="TimeoutException">Ha pedido un nuevo código de verificación muchas veces en un corto período.</exception>
     public async Task<string> ResendVerifyEmail(ResendVerifyDTO resendVerifyDTO)
     {
         var currentTime = DateTime.UtcNow;
@@ -322,6 +365,14 @@ public class UserService : IUserService
         return "Se ha reenviado un nuevo código de verificación a su correo electrónico.";
     }
 
+    /// <summary>
+    /// Envía un correo de recuperación de contraseña al usuario.
+    /// </summary>
+    /// <param name="recoverPasswordDTO">Datos del usuario para recuperar la contraseña.</param>
+    /// <param name="httpContext">Contexto HTTP de la solicitud.</param>
+    /// <returns>Mensaje de éxito o error.</returns>
+    /// <exception cref="KeyNotFoundException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
     public async Task<string> SendPasswordRecoveryEmail(
         RecoverPasswordDTO recoverPasswordDTO,
         HttpContext httpContext
@@ -369,6 +420,14 @@ public class UserService : IUserService
         return "Codigo de recuperacion enviado exitosamente.";
     }
 
+    /// <summary>
+    /// Cambia la contraseña de un usuario mediante su correo electrónico.
+    /// </summary>
+    /// <param name="resetPasswordDTO">Datos del usuario para restablecer la contraseña.</param>
+    /// <returns>Mensaje de éxito o error.</returns>
+    /// <exception cref="KeyNotFoundException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="ArgumentException"></exception>
     public async Task<string> ChangeUserPasswordByEmailAsync(ResetPasswordDTO resetPasswordDTO)
     {
         User? user = await _userRepository.GetByEmailAsync(resetPasswordDTO.Email);
@@ -468,6 +527,52 @@ public class UserService : IUserService
     }
 
     /// <summary>
+    /// Cambia la contraseña de un usuario.
+    /// </summary>
+    /// <param name="token">Token de autenticacion</param>
+    /// <param name="userId">ID del usuario</param>
+    /// <param name="expiration">Fecha de expiración del token</param>
+    /// <param name="changePasswordDTO">Datos de la nueva contraseña</param>
+    /// <returns>Mensaje de éxito</returns>
+    public async Task<string> ChangeUserPasswordAsync(
+        string token,
+        int userId,
+        DateTime expiration,
+        ChangePasswordDTO changePasswordDTO
+    )
+    {
+        User user =
+            await _userRepository.GetByIdAsync(userId)
+            ?? throw new KeyNotFoundException("Usuario no encontrado.");
+        var isPsswordValid = await _userRepository.CheckPasswordAsync(
+            user,
+            changePasswordDTO.CurrentPassword
+        );
+        if (!isPsswordValid)
+        {
+            Log.Warning($"La contraseña actual es incorrecta para el usuario ID: {userId}");
+            throw new InvalidOperationException("La contraseña actual es incorrecta.");
+        }
+        bool changePassword = await _userRepository.ChangeUserPasswordAsync(
+            user,
+            changePasswordDTO.NewPassword
+        );
+        if (!changePassword)
+        {
+            Log.Warning($"No se pudo actualizar la contraseña para el usuario ID: {userId}");
+            throw new InvalidOperationException("No se pudo actualizar la contraseña.");
+        }
+        Log.Information($"Contraseña actualizada para el usuario ID: {userId}", userId);
+        var blacklistToken = await _tokenService.AddTokenToBlacklist(token, userId, expiration);
+        if (!blacklistToken)
+        {
+            Log.Warning($"No se pudieron invalidar los tokens para el usuario ID: {userId}");
+            throw new InvalidOperationException("No se pudieron invalidar los tokens.");
+        }
+        return "Contraseña cambiada exitosamente.";
+    }
+
+    /// <summary>
     /// Normaliza un número de teléfono al formato internacional chileno.
     /// </summary>
     /// <param name="phoneNumber"></param>
@@ -475,7 +580,7 @@ public class UserService : IUserService
     public string NormalizePhoneNumber(string phoneNumber)
     {
         var digits = new string(phoneNumber.Where(char.IsDigit).ToArray());
-        return "+56 " + digits;
+        return "+569 " + digits;
     }
 
     /// <summary>
@@ -501,5 +606,261 @@ public class UserService : IUserService
             ?? throw new KeyNotFoundException("Usuario no encontrado.");
         Log.Information("Perfil de usuario obtenido para el usuario ID: {UserId}", userId);
         return user.Adapt<ViewUserProfileDTO>();
+    }
+
+    /// <summary>
+    /// Actualiza el perfil de un usuario.
+    /// </summary>
+    /// <param name="userId">ID del usuario a actualizar</param>
+    /// <param name="updateProfileDTO">Datos a actualizar</param>
+    /// <returns>Mensaje de éxito</returns>
+    /// <exception cref="KeyNotFoundException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="Exception"></exception>
+    public async Task<string> UpdateUserProfileAsync(int userId, UpdateProfileDTO updateProfileDTO)
+    {
+        Log.Information("Actualizando perfil de usuario para el usuario ID: {UserId}", userId);
+        User? user =
+            await _userRepository.GetByIdAsync(userId)
+            ?? throw new KeyNotFoundException("Usuario no encontrado.");
+        if (updateProfileDTO.Email != null)
+        {
+            if (updateProfileDTO.Email == user.Email)
+            {
+                throw new InvalidOperationException(
+                    "El nuevo correo electrónico no puede ser igual al actual."
+                );
+            }
+            bool emailExists = await _userRepository.ExistsByEmailAsync(updateProfileDTO.Email);
+            if (emailExists)
+            {
+                throw new InvalidOperationException("El correo electrónico ya está en uso.");
+            }
+            string verificationCode = new Random().Next(100000, 999999).ToString();
+            VerificationCode code = new VerificationCode
+            {
+                Type = CodeType.EmailVerification,
+                Code = verificationCode,
+                Expiration = DateTime.UtcNow.AddMinutes(_verificationCodeExpirationInMinutes),
+                UserId = user.Id,
+            };
+            Log.Information(
+                "Codigo de verificacion generado para cambio de email para el usuario ID: {UserId}.",
+                user.Id
+            );
+            var newEmailVerificationCode = await _verificationCodeRepository.CreateAsync(code);
+            await _emailService.SendChangeEmailVerificationCodeAsync(
+                updateProfileDTO.Email,
+                newEmailVerificationCode.Code
+            );
+            Log.Information(
+                "Correo de verificacion enviado para cambio de email para el usuario ID: {UserId}.",
+                user.Id
+            );
+        }
+        if (updateProfileDTO.Rut != null)
+        {
+            if (updateProfileDTO.Rut == user.Rut)
+            {
+                throw new InvalidOperationException("El nuevo RUT no puede ser igual al actual.");
+            }
+            bool rutExists = await _userRepository.ExistsByRutAsync(updateProfileDTO.Rut);
+            if (rutExists)
+            {
+                throw new InvalidOperationException("El RUT ya está en uso.");
+            }
+        }
+        updateProfileDTO.Adapt(user);
+
+        bool updateResult = await _userRepository.UpdateAsync(user);
+        if (!updateResult)
+        {
+            Log.Error(
+                "Error al actualizar el perfil de usuario para el usuario ID: {UserId}",
+                userId
+            );
+            throw new Exception("Error al actualizar el perfil de usuario.");
+        }
+        return "Perfil de usuario actualizado exitosamente.";
+    }
+
+    /// <summary>
+    /// Obtiene una lista paginada y filtrada de usuarios para el administrador.
+    /// </summary>
+    /// <param name="searchParams">Parámetros de búsqueda para filtrar usuarios.</param>
+    /// <returns>Una lista paginada y filtrada de usuarios para el administrador.</returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public async Task<ListedUsersForAdminDTO> GetFilteredForAdminAsync(UserSearchParamsDTO searchParams)
+    {
+        if (searchParams.PageNumber < 1)
+        {
+            throw new ArgumentOutOfRangeException("El número de página debe ser mayor o igual a 1.");
+        }
+        if (searchParams.PageSize < 1)
+        {
+            throw new ArgumentOutOfRangeException("El tamaño de página debe ser mayor o igual a 1.");
+        }
+        Log.Information("Obteniendo usuarios filtrados para admin.");
+        var (users, totalCount) = await _userRepository.GetFilteredForAdminAsync(searchParams);
+
+        var totalPages = (int)
+            Math.Ceiling((double)totalCount / (searchParams.PageSize ?? _defaultPageSize));
+        int currentPage = searchParams.PageNumber;
+        int pageSize = searchParams.PageSize ?? _defaultPageSize;
+        if (currentPage < 1 || currentPage > totalPages)
+        {
+            throw new ArgumentOutOfRangeException("El número de página está fuera de rango.");
+        }
+        Log.Information("Total de usuarios encontrados: {TotalCount}", totalCount);
+
+        return new ListedUsersForAdminDTO
+        {
+            Users = users.Adapt<List<UserForAdminDTO>>(),
+            TotalCount = totalCount,
+            CurrentPage = currentPage,
+            PageSize = pageSize,
+            TotalPages = totalPages
+        };
+    }
+
+    /// <summary>
+    /// Obtiene los detalles de un usuario por su ID para el administrador.
+    /// </summary>
+    /// <param name="userId">ID del usuario.</param>
+    /// <returns>Detalles del usuario.</returns>
+    /// <exception cref="KeyNotFoundException"></exception>
+    public async Task<UserDetailsForAdminDTO> GetByIdAsync(int userId)
+    {
+        User? user =
+            await _userRepository.GetByIdAsync(userId)
+            ?? throw new KeyNotFoundException("Usuario no encontrado.");
+        var userDetails = user.Adapt<UserDetailsForAdminDTO>();
+        userDetails.RoleName = await _userRepository.GetUserRoleAsync(user);
+        return userDetails;
+    }
+
+    /// <summary>
+    /// Actualiza el estado de un usuario.
+    /// </summary>
+    /// <param name="adminId">ID del administrador que realiza el cambio.</param>
+    /// <param name="userId">ID del usuario cuyo estado se va a actualizar.</param>
+    /// <param name="updateUserStatusDTO">Objeto que contiene la información del nuevo estado.</param>
+    /// <returns>Un mensaje indicando el resultado de la operación.</returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="KeyNotFoundException"></exception>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="Exception"></exception>
+    public async Task<string> UpdateUserStatusAsync(int adminId, int userId, UpdateUserStatusDTO updateUserStatusDTO)
+    {
+        if (adminId == userId)
+        {
+            throw new InvalidOperationException("Un administrador no puede cambiar su propio estado.");
+        }
+        Log.Information("Buscando usuario para actualizar estado, Usuario ID: {UserId}", userId);
+        User? user =
+            await _userRepository.GetByIdAsync(userId)
+            ?? throw new KeyNotFoundException("Usuario no encontrado.");
+        if (!Enum.TryParse(updateUserStatusDTO.Status, out UserStatus newStatus))
+        {
+            throw new ArgumentException("Estado inválido.");
+        }
+
+        Log.Information("Estado del usuario actualizado para el usuario ID: {UserId}", userId);
+
+        var auditLog = new AuditLog
+        {
+            ChangedBy = adminId,
+            UserId = userId,
+            Reason = updateUserStatusDTO.Reason ?? "No especificado",
+            NewStatus = newStatus,
+            PreviousStatus = user.Status,
+            ChangedAt = DateTime.UtcNow,
+            ActionType = ActionType.StatusChange,
+            User = user
+        };
+
+        var auditLogResult = await _auditLogRepository.CreateAsync(auditLog);
+        if (!auditLogResult)
+        {
+            Log.Error(
+                "Error al crear el registro de auditoría para el cambio de estado del usuario ID: {UserId}",
+                userId
+            );
+            throw new Exception("Error al crear el registro de auditoría.");
+        }
+
+        Log.Information("Actualizando estado del usuario ID: {UserId} a {NewState}", userId, newStatus);
+        user.Status = newStatus;
+
+        bool updateResult = await _userRepository.UpdateAsync(user);
+        if (!updateResult)
+        {
+            Log.Error(
+                "Error al actualizar el estado del usuario para el usuario ID: {UserId}",
+                userId
+            );
+            throw new Exception("Error al actualizar el estado del usuario.");
+        }
+        return "Estado del usuario actualizado exitosamente.";
+    }
+
+    /// <summary>
+    /// Actualiza el rol de un usuario.
+    /// </summary>
+    /// <param name="adminId">ID del administrador que realiza el cambio.</param>
+    /// <param name="userId">ID del usuario cuyo rol se va a actualizar.</param>
+    /// <param name="updateUserRoleDTO">Objeto que contiene la información del nuevo rol.</param>
+    /// <returns>Un mensaje indicando el resultado de la operación.</returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="KeyNotFoundException"></exception>
+    /// <exception cref="Exception"></exception>
+    public async Task<string> UpdateUserRoleAsync(int adminId, int userId, UpdateUserRoleDTO updateUserRoleDTO)
+    {
+        var notLastAdmin = await _userRepository.HasAdminsAsync();
+        if (adminId == userId && !notLastAdmin)
+        {
+            throw new InvalidOperationException("Un administrador no puede cambiar su propio rol si es que es el unico administrador.");
+        }
+        Log.Information("Buscando usuario para actualizar rol, Usuario ID: {UserId}", userId);
+        User? user =
+            await _userRepository.GetByIdAsync(userId)
+            ?? throw new KeyNotFoundException("Usuario no encontrado.");
+
+        var auditLog = new AuditLog
+        {
+            ChangedBy = adminId,
+            UserId = userId,
+            NewRole = updateUserRoleDTO.NewRole,
+            PreviousRole = await _userRepository.GetUserRoleAsync(user),
+            ChangedAt = DateTime.UtcNow,
+            ActionType = ActionType.RoleChange,
+            User = user
+        };
+
+        Log.Information("Guardando datos de auditoria para el usuario ID: {UserId}", userId);
+
+
+        var auditLogResult = await _auditLogRepository.CreateAsync(auditLog);
+        if (!auditLogResult)
+        {
+            Log.Error(
+                "Error al crear el registro de auditoría para el cambio de rol del usuario ID: {UserId}",
+                userId
+            );
+            throw new Exception("Error al crear el registro de auditoría.");
+        }
+
+        Log.Information("Actualizando rol del usuario ID: {UserId} a {NewRole}", userId, updateUserRoleDTO.NewRole);
+        bool roleUpdateResult = await _userRepository.UpdateUserRoleAsync(user, updateUserRoleDTO.NewRole);
+        if (!roleUpdateResult)
+        {
+            Log.Error(
+                "Error al actualizar el rol del usuario para el usuario ID: {UserId}",
+                userId
+            );
+            throw new Exception("Error al actualizar el rol del usuario.");
+        }
+
+        return "Rol del usuario actualizado exitosamente.";
     }
 }
