@@ -26,6 +26,8 @@ var connectionString =
 builder.Services.AddScoped<UserMapper>();
 builder.Services.AddScoped<ProductMapper>();
 builder.Services.AddScoped<CartMapper>();
+builder.Services.AddScoped<OrderMapper>();
+builder.Services.AddScoped<AuditMapper>();
 
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
@@ -45,6 +47,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IBlacklistedTokensRepository, BlacklistedTokensRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
 #region Email Service Configuration
 builder.Services.AddOptions();

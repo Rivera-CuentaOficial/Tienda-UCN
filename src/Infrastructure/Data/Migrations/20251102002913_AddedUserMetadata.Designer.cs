@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TiendaUCN.src.Infrastructure.Data;
 
@@ -10,9 +11,11 @@ using TiendaUCN.src.Infrastructure.Data;
 namespace TiendaUCN.src.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20251102002913_AddedUserMetadata")]
+    partial class AddedUserMetadata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
@@ -114,46 +117,6 @@ namespace TiendaUCN.src.Infrastructure.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("TiendaUCN.src.Domain.Models.AuditLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ActionType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("ChangedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ChangedBy")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("NewRole")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("NewStatus")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("PreviousRole")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("PreviousStatus")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AuditLogs");
                 });
 
             modelBuilder.Entity("TiendaUCN.src.Domain.Models.BlacklistedToken", b =>
@@ -484,7 +447,7 @@ namespace TiendaUCN.src.Infrastructure.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Status")
+                    b.Property<int>("State")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -627,17 +590,6 @@ namespace TiendaUCN.src.Infrastructure.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("TiendaUCN.src.Domain.Models.AuditLog", b =>
-                {
-                    b.HasOne("TiendaUCN.src.Domain.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TiendaUCN.src.Domain.Models.BlacklistedToken", b =>
