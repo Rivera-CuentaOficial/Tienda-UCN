@@ -13,12 +13,14 @@ public class ProductService : IProductService
 {
     private readonly IProductRepository _productRepository;
     private readonly IConfiguration _configuration;
+    private readonly IFileService _fileService;
     private readonly int _defaultPageSize;
 
-    public ProductService(IProductRepository productRepository, IConfiguration configuration)
+    public ProductService(IProductRepository productRepository, IConfiguration configuration, IFileService fileService)
     {
         _productRepository = productRepository;
         _configuration = configuration;
+        _fileService = fileService;
         _defaultPageSize =
             _configuration.GetValue<int?>("Products:DefaultPageSize")
             ?? throw new ArgumentNullException(
@@ -130,19 +132,29 @@ public class ProductService : IProductService
         product.Images = new List<Image>();
         int productId = await _productRepository.CreateAsync(product);
         Log.Information("Producto creado: {@Product}", product);
-        //TODO
-        /*if (createProductDTO.Images == null || !createProductDTO.Images.Any())
+
+        // Si se enviaron imágenes en el DTO las subimos a Cloudinary y las asociamos al producto
+        if (createProductDTO.Images == null || !createProductDTO.Images.Any())
         {
-            Log.Information("No se proporcionaron imágenes. Se asignará la imagen por defecto.");
-            throw new InvalidOperationException(
-                "Debe proporcionar al menos una imagen para el producto."
-            );
+            Log.Information("No se proporcionaron imágenes. No se subirán imágenes al crear el producto.");
         }
-        foreach (var image in createProductDTO.Images)
+        else
         {
-            Log.Information("Imagen asociada al producto: {@Image}", image);
-            await _fileService.UploadAsync(image, productId);
-        }*/
+            foreach (var image in createProductDTO.Images)
+            {
+                try
+                {
+                    Log.Information("Subiendo imagen asociada al producto: {FileName}", image.FileName);
+                    await _fileService.UploadAsync(image, productId);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Error subiendo la imagen {FileName} para el producto {ProductId}", image.FileName, productId);
+                    throw; // Dejar que el middleware de excepciones maneje la respuesta
+                }
+            }
+        }
+
         return product.Id.ToString();
     }
 

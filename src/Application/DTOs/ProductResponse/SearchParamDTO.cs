@@ -5,13 +5,14 @@ namespace TiendaUCN.src.Application.DTOs.ProductResponse;
 
 public class SearchParamsDTO
 {
-    [Required(ErrorMessage = "El número de página es obligatorio.")]
+    // Hacemos que PageNumber tenga un valor por defecto (1) para evitar errores de validación
+    // cuando el cliente no lo proporciona en la query string.
     [Range(
         1,
         int.MaxValue,
         ErrorMessage = "El número de página debe ser un número entero positivo."
     )]
-    public int PageNumber { get; set; }
+    public int PageNumber { get; set; } = 1;
 
     [Range(
         1,
