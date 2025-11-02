@@ -1,7 +1,10 @@
+using Bogus.DataSets;
 using Mapster;
+using Microsoft.AspNetCore.WebUtilities;
 using Serilog;
 using TiendaUCN.src.Application.DTOs.AuthResponse;
 using TiendaUCN.src.Application.DTOs.UserResponse;
+using TiendaUCN.src.Application.DTOs.UserResponse.AdminDTO;
 using TiendaUCN.src.Application.Services.Interfaces;
 using TiendaUCN.src.Domain.Models;
 using TiendaUCN.src.Infrastructure.Repositories.Interfaces;
@@ -14,8 +17,10 @@ public class UserService : IUserService
     private readonly IUserRepository _userRepository;
     private readonly IEmailService _emailService;
     private readonly IVerificationCodeRepository _verificationCodeRepository;
+    private readonly IAuditLogRepository _auditLogRepository;
     private readonly IConfiguration _configuration;
     private readonly int _verificationCodeExpirationInMinutes;
+    private readonly int _defaultPageSize;
 
     /// <summary>
     /// Inicializa una nueva instancia de la clase <see cref="UserService"/>.
@@ -30,6 +35,7 @@ public class UserService : IUserService
         IUserRepository userRepository,
         IEmailService emailService,
         IVerificationCodeRepository verificationCodeRepository,
+        IAuditLogRepository auditLogRepository,
         IConfiguration configuration
     )
     {
@@ -37,10 +43,12 @@ public class UserService : IUserService
         _userRepository = userRepository;
         _emailService = emailService;
         _verificationCodeRepository = verificationCodeRepository;
+        _auditLogRepository = auditLogRepository;
         _configuration = configuration;
         _verificationCodeExpirationInMinutes = _configuration.GetValue<int>(
             "VerificationCode:ExpirationTimeInMinutes"
         );
+        _defaultPageSize = _configuration.GetValue<int>("Users:DefaultPageSize");
     }
 
     /// <summary>
@@ -87,6 +95,7 @@ public class UserService : IUserService
         }
         // Obtener el rol del usuario
         var roleName = await _userRepository.GetUserRoleAsync(user);
+        user.LastLoginAt = DateTime.UtcNow;
         // Generar el token JWT
         Log.Information(
             "Inicio de sesión exitoso para el correo {Email} desde la IP {IP}",
@@ -517,6 +526,14 @@ public class UserService : IUserService
         return "Se ha reseteado la contraseña correctamente";
     }
 
+    /// <summary>
+    /// Cambia la contraseña de un usuario.
+    /// </summary>
+    /// <param name="token">Token de autenticacion</param>
+    /// <param name="userId">ID del usuario</param>
+    /// <param name="expiration">Fecha de expiración del token</param>
+    /// <param name="changePasswordDTO">Datos de la nueva contraseña</param>
+    /// <returns>Mensaje de éxito</returns>
     public async Task<string> ChangeUserPasswordAsync(
         string token,
         int userId,
@@ -665,5 +682,175 @@ public class UserService : IUserService
             throw new Exception("Error al actualizar el perfil de usuario.");
         }
         return "Perfil de usuario actualizado exitosamente.";
+    }
+
+    /// <summary>
+    /// Obtiene una lista paginada y filtrada de usuarios para el administrador.
+    /// </summary>
+    /// <param name="searchParams">Parámetros de búsqueda para filtrar usuarios.</param>
+    /// <returns>Una lista paginada y filtrada de usuarios para el administrador.</returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public async Task<ListedUsersForAdminDTO> GetFilteredForAdminAsync(UserSearchParamsDTO searchParams)
+    {
+        if (searchParams.PageNumber < 1)
+        {
+            throw new ArgumentOutOfRangeException("El número de página debe ser mayor o igual a 1.");
+        }
+        if (searchParams.PageSize < 1)
+        {
+            throw new ArgumentOutOfRangeException("El tamaño de página debe ser mayor o igual a 1.");
+        }
+        Log.Information("Obteniendo usuarios filtrados para admin.");
+        var (users, totalCount) = await _userRepository.GetFilteredForAdminAsync(searchParams);
+
+        var totalPages = (int)
+            Math.Ceiling((double)totalCount / (searchParams.PageSize ?? _defaultPageSize));
+        int currentPage = searchParams.PageNumber;
+        int pageSize = searchParams.PageSize ?? _defaultPageSize;
+        if (currentPage < 1 || currentPage > totalPages)
+        {
+            throw new ArgumentOutOfRangeException("El número de página está fuera de rango.");
+        }
+        Log.Information("Total de usuarios encontrados: {TotalCount}", totalCount);
+
+        return new ListedUsersForAdminDTO
+        {
+            Users = users.Adapt<List<UserForAdminDTO>>(),
+            TotalCount = totalCount,
+            CurrentPage = currentPage,
+            PageSize = pageSize,
+            TotalPages = totalPages
+        };
+    }
+
+    /// <summary>
+    /// Obtiene los detalles de un usuario por su ID para el administrador.
+    /// </summary>
+    /// <param name="userId">ID del usuario.</param>
+    /// <returns>Detalles del usuario.</returns>
+    /// <exception cref="KeyNotFoundException"></exception>
+    public async Task<UserDetailsForAdminDTO> GetByIdAsync(int userId)
+    {
+        User? user =
+            await _userRepository.GetByIdAsync(userId)
+            ?? throw new KeyNotFoundException("Usuario no encontrado.");
+        var userDetails = user.Adapt<UserDetailsForAdminDTO>();
+        userDetails.RoleName = await _userRepository.GetUserRoleAsync(user);
+        return userDetails;
+    }
+
+    /// <summary>
+    /// Actualiza el estado de un usuario.
+    /// </summary>
+    /// <param name="adminId">ID del administrador que realiza el cambio.</param>
+    /// <param name="userId">ID del usuario cuyo estado se va a actualizar.</param>
+    /// <param name="updateUserStatusDTO">Objeto que contiene la información del nuevo estado.</param>
+    /// <returns>Un mensaje indicando el resultado de la operación.</returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="KeyNotFoundException"></exception>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="Exception"></exception>
+    public async Task<string> UpdateUserStatusAsync(int adminId, int userId, UpdateUserStatusDTO updateUserStatusDTO)
+    {
+        if (adminId == userId)
+        {
+            throw new InvalidOperationException("Un administrador no puede cambiar su propio estado.");
+        }
+        Log.Information("Buscando usuario para actualizar estado, Usuario ID: {UserId}", userId);
+        User? user =
+            await _userRepository.GetByIdAsync(userId)
+            ?? throw new KeyNotFoundException("Usuario no encontrado.");
+        if (!Enum.TryParse(updateUserStatusDTO.Status, out UserStatus newStatus))
+        {
+            throw new ArgumentException("Estado inválido.");
+        }
+
+        Log.Information("Estado del usuario actualizado para el usuario ID: {UserId}", userId);
+
+        var auditLog = new AuditLog
+        {
+            ChangedBy = adminId,
+            UserId = userId,
+            Reason = updateUserStatusDTO.Reason ?? "No especificado",
+            NewStatus = newStatus,
+            PreviousStatus = user.Status,
+            ChangedAt = DateTime.UtcNow,
+            ActionType = ActionType.StatusChange,
+            User = user
+        };
+
+        var auditLogResult = await _auditLogRepository.CreateAsync(auditLog);
+        if (!auditLogResult)
+        {
+            Log.Error(
+                "Error al crear el registro de auditoría para el cambio de estado del usuario ID: {UserId}",
+                userId
+            );
+            throw new Exception("Error al crear el registro de auditoría.");
+        }
+
+        Log.Information("Actualizando estado del usuario ID: {UserId} a {NewState}", userId, newStatus);
+        user.Status = newStatus;
+
+        bool updateResult = await _userRepository.UpdateAsync(user);
+        if (!updateResult)
+        {
+            Log.Error(
+                "Error al actualizar el estado del usuario para el usuario ID: {UserId}",
+                userId
+            );
+            throw new Exception("Error al actualizar el estado del usuario.");
+        }
+        return "Estado del usuario actualizado exitosamente.";
+    }
+
+    public async Task<string> UpdateUserRoleAsync(int adminId, int userId, UpdateUserRoleDTO updateUserRoleDTO)
+    {
+        var notLastAdmin = await _userRepository.HasAdminsAsync();
+        if (adminId == userId && !notLastAdmin)
+        {
+            throw new InvalidOperationException("Un administrador no puede cambiar su propio rol si es que es el unico administrador.");
+        }
+        Log.Information("Buscando usuario para actualizar rol, Usuario ID: {UserId}", userId);
+        User? user =
+            await _userRepository.GetByIdAsync(userId)
+            ?? throw new KeyNotFoundException("Usuario no encontrado.");
+
+        var auditLog = new AuditLog
+        {
+            ChangedBy = adminId,
+            UserId = userId,
+            NewRole = updateUserRoleDTO.NewRole,
+            PreviousRole = await _userRepository.GetUserRoleAsync(user),
+            ChangedAt = DateTime.UtcNow,
+            ActionType = ActionType.RoleChange,
+            User = user
+        };
+
+        Log.Information("Guardando datos de auditoria para el usuario ID: {UserId}", userId);
+
+
+        var auditLogResult = await _auditLogRepository.CreateAsync(auditLog);
+        if (!auditLogResult)
+        {
+            Log.Error(
+                "Error al crear el registro de auditoría para el cambio de rol del usuario ID: {UserId}",
+                userId
+            );
+            throw new Exception("Error al crear el registro de auditoría.");
+        }
+
+        Log.Information("Actualizando rol del usuario ID: {UserId} a {NewRole}", userId, updateUserRoleDTO.NewRole);
+        bool roleUpdateResult = await _userRepository.UpdateUserRoleAsync(user, updateUserRoleDTO.NewRole);
+        if (!roleUpdateResult)
+        {
+            Log.Error(
+                "Error al actualizar el rol del usuario para el usuario ID: {UserId}",
+                userId
+            );
+            throw new Exception("Error al actualizar el rol del usuario.");
+        }
+
+        return "Rol del usuario actualizado exitosamente.";
     }
 }

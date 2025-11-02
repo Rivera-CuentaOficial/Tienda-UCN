@@ -1,5 +1,7 @@
 using TiendaUCN.src.Application.DTOs.AuthResponse;
 using TiendaUCN.src.Application.DTOs.UserResponse;
+using TiendaUCN.src.Application.DTOs.UserResponse.AdminDTO;
+using TiendaUCN.src.Domain.Models;
 
 namespace TiendaUCN.src.Application.Services.Interfaces
 {
@@ -19,5 +21,9 @@ namespace TiendaUCN.src.Application.Services.Interfaces
         Task<int> DeleteUnconfirmedAsync();
         Task<ViewUserProfileDTO> GetUserProfileAsync(int userId);
         Task<string> UpdateUserProfileAsync(int userId, UpdateProfileDTO updateProfileDTO);
+        Task<ListedUsersForAdminDTO> GetFilteredForAdminAsync(UserSearchParamsDTO searchParams);
+        Task<UserDetailsForAdminDTO> GetByIdAsync(int id);
+        Task<string> UpdateUserStatusAsync(int adminId, int userId, UpdateUserStatusDTO updateUserStatusDTO);
+        Task<string> UpdateUserRoleAsync(int adminId, int userId, UpdateUserRoleDTO updateUserRoleDTO);
     }
 }

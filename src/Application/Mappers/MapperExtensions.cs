@@ -18,6 +18,9 @@ public class MapperExtensions
         var orderMapper = serviceProvider.GetService<OrderMapper>();
         orderMapper?.ConfigureAllMappings();
 
+        var auditMapper = serviceProvider.GetService<AuditMapper>();
+        auditMapper?.ConfigureAllMapping();
+
         TypeAdapterConfig.GlobalSettings.Default.IgnoreNullValues(true);
     }
 }

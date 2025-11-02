@@ -1,4 +1,5 @@
 using Serilog;
+using System.Text.Json;
 using TiendaUCN.src.Application.DTOs.BaseResponse;
 using TiendaUCN.src.Application.Services.Interfaces;
 
@@ -24,15 +25,20 @@ namespace TiendaUCN.src.API.Middlewares
                 if (isBlacklisted)
                 {
                     Log.Warning("Intento de acceso con token bloqueado.");
-                    var statusCode = StatusCodes.Status401Unauthorized;
-                    string result = $"Codigo de estado = {statusCode}";
-                    context.Response.StatusCode = statusCode;
+
+                    throw new UnauthorizedAccessException("El token ha sido bloqueado.");
+
+                    /*ErrorDetail error = new ErrorDetail("No autorizado", "El token ha sido bloqueado.");
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     context.Response.ContentType = "application/json";
-                    await context.Response.WriteAsJsonAsync(new GenericResponse<object>(
-                        "Acceso no autorizado, token de acceso revocado",
-                        result
-                    ));
-                    return;
+
+                    var json = JsonSerializer.Serialize(
+                            error,
+                            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+                    
+                    await context.Response.WriteAsync(json);
+
+                    return;*/
                 }
             }
             await _next(context);
