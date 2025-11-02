@@ -53,5 +53,10 @@ namespace TiendaUCN.src.Domain.Models
         /// Fecha de actualización del pedido.
         /// </summary>
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+        /// <summary>
+        /// Estado del pedido.
+        /// </summary>
+        public OrderStatus Status { get; set; } = OrderStatus.Pending;
     }
 }

@@ -26,5 +26,10 @@ namespace TiendaUCN.src.Application.Services.Interfaces
         /// <param name="userId">Id del usuario al que pertenecen las órdenes</param>
         /// <returns>Ordenes del usuario</returns>
         Task<ListedOrderDetailDTO> GetByUserIdAsync(SearchParamsDTO searchParams, int userId);
+
+        /// <summary>
+        /// Actualiza el estado de una orden (uso administrativo).
+        /// </summary>
+        Task UpdateOrderStatusAsync(string orderCode, string status);
     }
 }

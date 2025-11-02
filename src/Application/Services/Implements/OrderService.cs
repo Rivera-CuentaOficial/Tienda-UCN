@@ -131,5 +131,26 @@ namespace TiendaUCN.src.Application.Services.Implements
             } while (await _orderRepository.CodeExistsAsync(code));
             return code;
         }
+
+        /// <summary>
+        /// Actualiza el estado de una orden. Convierte la cadena recibida a OrderStatus y delega al repositorio.
+        /// </summary>
+        public async Task UpdateOrderStatusAsync(string orderCode, string status)
+        {
+            var order = await _orderRepository.GetByCodeAsync(orderCode)
+                ?? throw new KeyNotFoundException("Orden no encontrada");
+
+            if (!Enum.TryParse(typeof(OrderStatus), status, true, out var parsed))
+            {
+                throw new ArgumentException("Estado de orden inválido.");
+            }
+
+            var orderStatus = (OrderStatus)parsed!;
+            var updated = await _orderRepository.UpdateStatusAsync(orderCode, orderStatus);
+            if (!updated)
+            {
+                throw new InvalidOperationException("No se pudo actualizar el estado de la orden.");
+            }
+        }
     }
 }

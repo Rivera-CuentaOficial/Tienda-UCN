@@ -66,6 +66,57 @@ namespace TiendaUCN.src.Infrastructure.Repositories.Implements
                 .FirstOrDefaultAsync(o => o.Code == orderCode);
         }
 
+        public async Task<(IEnumerable<Order> orders, int totalCount)> GetFilteredForAdminAsync(
+            SearchParamsDTO searchParams
+        )
+        {
+            var query = _context
+                .Orders.AsNoTracking()
+                .Include(or => or.OrderItems)
+                .Include(or => or.User)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchParams.SearchTerm))
+            {
+                var searchTerm = searchParams.SearchTerm.Trim().ToLower();
+                query = query.Where(o =>
+                    o.Code.ToLower().Contains(searchTerm)
+                    || o.User.FirstName.ToLower().Contains(searchTerm)
+                    || o.User.LastName.ToLower().Contains(searchTerm)
+                );
+            }
+
+            int totalCount = await query.CountAsync();
+            int pageSize = searchParams.PageSize ?? _defaultPageSize;
+            var orders = await query
+                .OrderByDescending(o => o.CreatedAt)
+                .Skip((searchParams.PageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (orders, totalCount);
+        }
+
+        public async Task<bool> DeleteByCodeAsync(string orderCode)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Code == orderCode);
+            if (order == null) return false;
+            _context.Orders.Remove(order);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateStatusAsync(string orderCode, OrderStatus status)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Code == orderCode);
+            if (order == null) return false;
+            order.Status = status;
+            order.UpdatedAt = DateTime.UtcNow;
+            _context.Orders.Update(order);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         /// <summary>
         /// Obtiene las órdenes de un usuario por su ID.
         /// </summary>

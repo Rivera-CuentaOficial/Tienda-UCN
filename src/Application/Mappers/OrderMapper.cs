@@ -44,7 +44,8 @@ namespace TiendaUCN.src.Application.Mappers
                 )
                 .Map(dest => dest.Code, src => src.Code)
                 .Map(dest => dest.Total, src => src.Total.ToString("C"))
-                .Map(dest => dest.SubTotal, src => src.SubTotal.ToString("C"));
+                .Map(dest => dest.SubTotal, src => src.SubTotal.ToString("C"))
+                .Map(dest => dest.Status, src => src.Status.ToString());
 
             TypeAdapterConfig<Cart, Order>
                 .NewConfig()

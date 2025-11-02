@@ -13,6 +13,18 @@ namespace TiendaUCN.src.Infrastructure.Repositories.Interfaces
         Task<Order?> GetByCodeAsync(string orderCode);
 
         /// <summary>
+        /// Obtiene las órdenes filtradas para administrador con paginación y búsqueda.
+        /// </summary>
+        Task<(IEnumerable<Order> orders, int totalCount)> GetFilteredForAdminAsync(
+            SearchParamsDTO searchParams
+        );
+
+        /// <summary>
+        /// Elimina una orden por su código.
+        /// </summary>
+        Task<bool> DeleteByCodeAsync(string orderCode);
+
+        /// <summary>
         /// Crea una nueva orden.
         /// </summary>
         /// <param name="order">La orden a crear.</param>
@@ -36,5 +48,10 @@ namespace TiendaUCN.src.Infrastructure.Repositories.Interfaces
             SearchParamsDTO searchParams,
             int userId
         );
+
+        /// <summary>
+        /// Actualiza el estado de una orden identificado por su código.
+        /// </summary>
+        Task<bool> UpdateStatusAsync(string orderCode, OrderStatus status);
     }
 }
