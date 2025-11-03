@@ -100,9 +100,10 @@ namespace TiendaUCN.src.API.Controllers
         /// </summary>
         /// <param name="changeItemQuantityDTO">Id del item y cantidad nueva</param>
         /// <returns>Resultado con el carrito de compras actualizado.</returns>
-        [HttpPut("items")]
+        [HttpPut("items/{productId}")]
         [AllowAnonymous]
         public async Task<IActionResult> UpdateItemQuantity(
+            int productId,
             [FromForm] ChangeItemQuantityDTO changeItemQuantityDTO
         )
         {
@@ -114,7 +115,7 @@ namespace TiendaUCN.src.API.Controllers
             var parsedUserId = userId != null && int.TryParse(userId, out int id) ? id : (int?)null;
             var result = await _cartService.UpdateItemQuantityAsync(
                 buyerId,
-                changeItemQuantityDTO.ProductId,
+                productId,
                 changeItemQuantityDTO.Quantity,
                 parsedUserId
             );

@@ -7,7 +7,7 @@ public class MapperExtensions
     public static void ConfigureMapster(IServiceProvider serviceProvider)
     {
         var userMapper = serviceProvider.GetService<UserMapper>();
-        userMapper?.ConfigureAllMapping();
+        userMapper?.ConfigureAllMappings();
 
         var productMapper = serviceProvider.GetService<ProductMapper>();
         productMapper?.ConfigureAllMappings();
@@ -19,7 +19,10 @@ public class MapperExtensions
         orderMapper?.ConfigureAllMappings();
 
         var auditMapper = serviceProvider.GetService<AuditMapper>();
-        auditMapper?.ConfigureAllMapping();
+        auditMapper?.ConfigureAllMappings();
+
+        var categoryAndBrandMapper = serviceProvider.GetService<CategoryAndBrandMapper>();
+        categoryAndBrandMapper?.ConfigureAllMappings();
 
         TypeAdapterConfig.GlobalSettings.Default.IgnoreNullValues(true);
     }

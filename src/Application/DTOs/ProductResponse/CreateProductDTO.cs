@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace TiendaUCN.src.Application.DTOs.ProductResponse;
@@ -43,7 +44,6 @@ public class CreateProductDTO
     [MinLength(3, ErrorMessage = "El nombre de la marca debe tener al menos 3 caracteres.")]
     public required string BrandName { get; set; }
 
-    //TODO
-    /*[Required(ErrorMessage = "Las imágenes del producto son obligatorias.")]
-    public required List<IFormFile> Images { get; set; } = new List<IFormFile>();*/
+    // Images opcionales al crear el producto (se reciben por multipart/form-data)
+    public List<IFormFile>? Images { get; set; } = new List<IFormFile>();
 }
