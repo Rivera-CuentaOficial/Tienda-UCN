@@ -6,8 +6,6 @@ namespace TiendaUCN.src.Infrastructure.Repositories.Interfaces;
 public interface IProductRepository
 {
     Task<int> CreateAsync(Product product);
-    Task<Brand> CreateOrGetBrandAsync(string brandName);
-    Task<Category> CreateOrGetCategoryAsync(string categoryName);
     Task<(IEnumerable<Product> products, int totalCount)> GetFilteredForAdminAsync(
         SearchParamsDTO searchParams
     );
@@ -19,4 +17,6 @@ public interface IProductRepository
     Task ToggleActiveAsync(int id);
     Task<int> GetRealStockAsync(int productId);
     Task UpdateStockAsync(int productId, int stock);
+    Task<int> CountProductsByCategoryIdAsync(int categoryId);
+    Task<int> CountProductsByBrandIdAsync(int brandId);
 }

@@ -19,37 +19,7 @@ public class ProductRepository : IProductRepository
         return product.Id;
     }
 
-    public async Task<Brand> CreateOrGetBrandAsync(string brandName)
-    {
-        var brand = await _context
-            .Brands.AsNoTracking()
-            .FirstOrDefaultAsync(b => b.Name.ToLower() == brandName.ToLower());
 
-        if (brand != null)
-        {
-            return brand;
-        }
-        brand = new Brand { Name = brandName };
-        await _context.Brands.AddAsync(brand);
-        await _context.SaveChangesAsync();
-        return brand;
-    }
-
-    public async Task<Category> CreateOrGetCategoryAsync(string categoryName)
-    {
-        var category = await _context
-            .Categories.AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Name.ToLower() == categoryName.ToLower());
-
-        if (category != null)
-        {
-            return category;
-        }
-        category = new Category { Name = categoryName };
-        await _context.Categories.AddAsync(category);
-        await _context.SaveChangesAsync();
-        return category;
-    }
 
     public ProductRepository(DataContext context, IConfiguration configuration)
     {
@@ -181,5 +151,19 @@ public class ProductRepository : IProductRepository
             ?? throw new KeyNotFoundException("Producto no encontrado");
         product.Stock = stock;
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<int> CountProductsByCategoryIdAsync(int categoryId)
+    {
+        return await _context.Products
+            .Where(p => p.CategoryId == categoryId)
+            .CountAsync();
+    }
+
+    public async Task<int> CountProductsByBrandIdAsync(int brandId)
+    {
+        return await _context.Products
+            .Where(p => p.BrandId == brandId)
+            .CountAsync();
     }
 }

@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TiendaUCN.src.Application.DTOs.BaseResponse;
 using TiendaUCN.src.Application.DTOs.ProductResponse;
-using TiendaUCN.src.Application.DTOs.ProductResponse.Admin;
-using TiendaUCN.src.Application.DTOs.ProductResponse.Customer;
+using TiendaUCN.src.Application.DTOs.ProductResponse.AdminDTO;
+using TiendaUCN.src.Application.DTOs.ProductResponse.CustomerDTO;
 using TiendaUCN.src.Application.Services.Interfaces;
 
 namespace TiendaUCN.src.API.Controllers;
@@ -17,23 +17,12 @@ public class ProductsController : BaseController
         _productService = productService;
     }
 
-    [HttpGet("admin/products")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> GetAllForAdminAsync([FromQuery] SearchParamsDTO searchParams)
-    {
-        var result = await _productService.GetFilteredForAdminAsync(searchParams);
-        if (result == null || result.Products.Count == 0)
-        {
-            throw new KeyNotFoundException("No se encontraron productos.");
-        }
-        return Ok(
-            new GenericResponse<ListedProductsForAdminDTO>(
-                "Productos obtenidos exitosamente",
-                result
-            )
-        );
-    }
-
+    /// <summary>
+    /// Obtiene todos los productos para el cliente con filtros.
+    /// </summary>
+    /// <param name="searchParams">Parámetros de búsqueda para filtrar los productos.</param>
+    /// <returns>Una lista de productos filtrados para el cliente.</returns>
+    /// <exception cref="KeyNotFoundException"></exception>
     [HttpGet("")]
     [AllowAnonymous]
     public async Task<IActionResult> GetAllForCustomerAsync(
@@ -53,6 +42,12 @@ public class ProductsController : BaseController
         );
     }
 
+    /// <summary>
+    /// Obtiene un producto por su ID para el cliente.
+    /// </summary>
+    /// <param name="id">El ID del producto.</param>
+    /// <returns>El producto correspondiente al ID proporcionado.</returns>
+    /// <exception cref="KeyNotFoundException"></exception>
     [HttpGet("{id}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetByIdForCustomerAsync(int id)
@@ -63,29 +58,6 @@ public class ProductsController : BaseController
             throw new KeyNotFoundException("Producto no encontrado.");
         }
         return Ok(new GenericResponse<ProductDetailDTO>("Producto obtenido exitosamente", result));
-    }
-
-    [HttpGet("admin/{id}")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> GetByIdForAdminAsync(int id)
-    {
-        var result = await _productService.GetByIdForAdminAsync(id);
-        if (result == null)
-        {
-            throw new KeyNotFoundException("Producto no encontrado.");
-        }
-        return Ok(new GenericResponse<ProductDetailDTO>("Producto obtenido exitosamente", result));
-    }
-
-    [HttpPost()]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateAsync([FromForm] CreateProductDTO createProductDTO)
-    {
-        var result = await _productService.CreateAsync(createProductDTO);
-        return Created(
-            $"/api/product/{result}",
-            new GenericResponse<string>("Producto creado exitosamente", result)
-        );
     }
 
     [HttpPatch("{id}/toggle-active")]

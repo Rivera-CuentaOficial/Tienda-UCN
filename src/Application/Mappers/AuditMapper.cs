@@ -6,7 +6,7 @@ namespace TiendaUCN.src.Application.Mappers
 {
     public class AuditMapper
     {
-        public void ConfigureAllMapping()
+        public void ConfigureAllMappings()
         {
             ConfigureAuditMapping();
         }

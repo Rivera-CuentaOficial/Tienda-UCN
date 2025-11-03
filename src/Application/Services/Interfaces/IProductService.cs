@@ -1,6 +1,6 @@
 using TiendaUCN.src.Application.DTOs.ProductResponse;
-using TiendaUCN.src.Application.DTOs.ProductResponse.Admin;
-using TiendaUCN.src.Application.DTOs.ProductResponse.Customer;
+using TiendaUCN.src.Application.DTOs.ProductResponse.AdminDTO;
+using TiendaUCN.src.Application.DTOs.ProductResponse.CustomerDTO;
 
 namespace TiendaUCN.src.Application.Services.Interfaces;
 

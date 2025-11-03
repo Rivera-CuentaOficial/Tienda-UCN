@@ -1,8 +1,8 @@
 using Mapster;
 using Serilog;
 using TiendaUCN.src.Application.DTOs.ProductResponse;
-using TiendaUCN.src.Application.DTOs.ProductResponse.Admin;
-using TiendaUCN.src.Application.DTOs.ProductResponse.Customer;
+using TiendaUCN.src.Application.DTOs.ProductResponse.AdminDTO;
+using TiendaUCN.src.Application.DTOs.ProductResponse.CustomerDTO;
 using TiendaUCN.src.Application.Services.Interfaces;
 using TiendaUCN.src.Domain.Models;
 using TiendaUCN.src.Infrastructure.Repositories.Interfaces;
@@ -12,13 +12,17 @@ namespace TiendaUCN.src.Application.Services.Implements;
 public class ProductService : IProductService
 {
     private readonly IProductRepository _productRepository;
+    private readonly ICategoryRepository _categoryRepository;
+    private readonly IBrandRepository _brandRepository;
     private readonly IConfiguration _configuration;
     private readonly IFileService _fileService;
     private readonly int _defaultPageSize;
 
-    public ProductService(IProductRepository productRepository, IConfiguration configuration, IFileService fileService)
+    public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, IBrandRepository brandRepository, IConfiguration configuration, IFileService fileService)
     {
         _productRepository = productRepository;
+        _categoryRepository = categoryRepository;
+        _brandRepository = brandRepository;
         _configuration = configuration;
         _fileService = fileService;
         _defaultPageSize =
@@ -28,6 +32,12 @@ public class ProductService : IProductService
             );
     }
 
+    /// <summary>
+    /// Obtiene productos filtrados para administradores.
+    /// </summary>
+    /// <param name="searchParams">Parámetros de búsqueda para filtrar productos.</param>
+    /// <returns>Productos filtrados para administradores.</returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public async Task<ListedProductsForAdminDTO> GetFilteredForAdminAsync(
         SearchParamsDTO searchParams
     )
@@ -122,10 +132,10 @@ public class ProductService : IProductService
     {
         Product product = createProductDTO.Adapt<Product>();
         Category category =
-            await _productRepository.CreateOrGetCategoryAsync(createProductDTO.CategoryName)
+            await _categoryRepository.CreateOrGetCategoryAsync(createProductDTO.CategoryName)
             ?? throw new Exception("Error al crear o obtener la categoría del producto.");
         Brand brand =
-            await _productRepository.CreateOrGetBrandAsync(createProductDTO.BrandName)
+            await _brandRepository.CreateOrGetBrandAsync(createProductDTO.BrandName)
             ?? throw new Exception("Error al crear o obtener la marca del producto.");
         product.CategoryId = category.Id;
         product.BrandId = brand.Id;

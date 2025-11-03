@@ -43,14 +43,6 @@ namespace TiendaUCN.src.Infrastructure.Repositories.Implements
         {
             var exists = await _context.BlacklistedTokens
                 .AnyAsync(t => t.Token == token && t.ExpiresAt > DateTime.UtcNow);
-            if (exists)
-            {
-                Log.Information("El token {Token} está bloqueado", token);
-            }
-            else
-            {
-                Log.Information("El token {Token} no está bloqueado", token);
-            }
             return exists;
         }
 

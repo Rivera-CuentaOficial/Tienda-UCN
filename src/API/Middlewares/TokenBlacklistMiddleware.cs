@@ -17,7 +17,6 @@ namespace TiendaUCN.src.API.Middlewares
         public async Task InvokeAsync(HttpContext context, ITokenService tokenService)
         {
             var authHeader = context.Request.Headers["Authorization"].ToString();
-            Log.Information($"Verificando estado del token {authHeader}.", authHeader);
             if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
             {
                 var token = authHeader.Replace("Bearer ", "");

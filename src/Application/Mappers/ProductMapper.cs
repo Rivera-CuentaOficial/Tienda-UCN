@@ -1,7 +1,7 @@
 using Mapster;
 using TiendaUCN.src.Application.DTOs.ProductResponse;
-using TiendaUCN.src.Application.DTOs.ProductResponse.Admin;
-using TiendaUCN.src.Application.DTOs.ProductResponse.Customer;
+using TiendaUCN.src.Application.DTOs.ProductResponse.AdminDTO;
+using TiendaUCN.src.Application.DTOs.ProductResponse.CustomerDTO;
 using TiendaUCN.src.Domain.Models;
 
 namespace TiendaUCN.src.Application.Mappers;

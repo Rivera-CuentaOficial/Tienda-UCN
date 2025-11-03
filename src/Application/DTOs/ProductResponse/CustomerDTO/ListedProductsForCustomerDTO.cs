@@ -1,4 +1,4 @@
-namespace TiendaUCN.src.Application.DTOs.ProductResponse.Customer;
+namespace TiendaUCN.src.Application.DTOs.ProductResponse.CustomerDTO;
 
 public class ListedProductsForCustomerDTO
 {

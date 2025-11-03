@@ -17,23 +17,6 @@ public class CategoryController : BaseController
         _context = context;
     }
 
-    [HttpGet("admin/categories")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> GetAllForAdminAsync()
-    {
-        var list = await _context.Categories.AsNoTracking().OrderBy(c => c.Name).ToListAsync();
-        return Ok(new GenericResponse<IEnumerable<Category>>("Categorias obtenidas", list));
-    }
-
-    [HttpGet("admin/{id}")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> GetByIdForAdminAsync(int id)
-    {
-        var category = await _context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
-        if (category == null) throw new KeyNotFoundException("Categoría no encontrada.");
-        return Ok(new GenericResponse<Category>("Categoría obtenida", category));
-    }
-
     [HttpPost]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateAsync([FromBody] CreateCategoryDTO dto)

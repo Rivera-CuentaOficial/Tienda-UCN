@@ -4,5 +4,5 @@ public class Brand
 {
     public int Id { get; set; }
     public required string Name { get; set; }
-    public DateTime CreateAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
