@@ -1,0 +1,2022 @@
+{
+	"info": {
+		"_postman_id": "6f9337b2-5261-449e-b062-c8749770585f",
+		"name": "Tienda UCN",
+		"description": "Collection que contiene todos los endpoint y flujos de prueba para el backend de el proyecto de TiendaUCN de IDWM.\n\nEquipo integrado por:\n\n- Sebastian Rivera ([srg004@alumnos.ucn.cl](https://mailto:srg004@alumnos.ucn.cl))\n    \n- Bayron Cruz ([bayron.cruz@alumnos.ucn.cl](https://mailto:bayron.cruz@alumnos.ucn.cl))",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45823445",
+		"_collection_link": "https://rivera-2203169.postman.co/workspace/Tienda-UCN~a0092b32-8ad9-46b9-b2c8-faf0c6e7e458/collection/45823445-6f9337b2-5261-449e-b062-c8749770585f?action=share&source=collection_link&creator=45823445"
+	},
+	"item": [
+		{
+			"name": "Flujo de autenticacion",
+			"item": [
+				{
+					"name": "Registro de usuario valido",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"srg004@alumnos.ucn.cl\",\n    \"password\": \"nuevoUsuario1!\",\n    \"confirmPassword\": \"nuevoUsuario1!\",\n    \"rut\": \"18791125-7\",\n    \"firstName\": \"Holi\",\n    \"lastName\": \" Hola\",\n    \"birthDate\": \"1995-05-05\",\n    \"phoneNumber\": \"123456789\",\n    \"gender\": \"Masculino\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/auth/register",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						},
+						"description": "## 📄 Propósito\n\nContiene las variables necesarias para un registro exitoso y en caso de exito devuelve un mensaje de exito. Por medio de el backend se envia un correo con un codigo de verificacion para ser usado en llamadas subsecuentes.\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **Body:**\n    \n    ``` json\n                      {\n                        \"email\": \"string, requerido, correo del usuario\",\n                        \"password\": \"string, requerido contraseña\"\n                        \"confirmPassword\": \"string, requerido, confirmacion de contraseña\"\n                        \"rut\": \"string, requerido, rut del usuario\"\n                        \"firstName\": \"string, requerido/, nombre del usuario\"\n                        \"lastName\": \"string, requerido, apellido del usuario\"\n                        \"birthDate\": \"string, requerido, fecha de nacimiento con formato YYYY-MM-DD\"\n                        \"phoneNumber\": \"string, requerido, numero de telefono chileno\"\n                        \"gender\": \"string, requerido, genero del usuario\"\n                      }\n    \n     ```\n    \n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n    _Mensaje de exito. Ejemplo de body:_\n    \n    ``` json\n                    {\n                      \"message\": \"valor\",\n                      \"data\": \"valor\"\n                    }\n    \n     ```\n    \n- **400 Bad Request:**  \n    Campo requerido sin rellenar.\n    \n- **409 Conflict:**  \n    Correo o rut ya registrado.\n    \n- **500 Internal Server Error:**  \n    Error de servidor.\n    \n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+					},
+					"response": []
+				},
+				{
+					"name": "Intendo de registro con el mismo email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"srg004@alumnos.ucn.cl\",\n    \"password\": \"nuevoUsuario2!\",\n    \"confirmPassword\": \"nuevoUsuario2!\",\n    \"rut\": \"18791125-7\",\n    \"firstName\": \"ADAM\",\n    \"lastName\": \" EVE\",\n    \"birthDate\": \"1996-05-05\",\n    \"phoneNumber\": \"123456789\",\n    \"gender\": \"Otro\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/auth/register",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						},
+						"description": "## 📄 Propósito\n\nContiene las variables necesarias para un registro exitoso y en caso de exito devuelve un mensaje de exito. Por medio de el backend se envia un correo con un codigo de verificacion para ser usado en llamadas subsecuentes.\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **Body:**\n    \n    ``` json\n                      {\n                        \"email\": \"string, requerido, correo del usuario\",\n                        \"password\": \"string, requerido contraseña\"\n                        \"confirmPassword\": \"string, requerido, confirmacion de contraseña\"\n                        \"rut\": \"string, requerido, rut del usuario\"\n                        \"firstName\": \"string, requerido/, nombre del usuario\"\n                        \"lastName\": \"string, requerido, apellido del usuario\"\n                        \"birthDate\": \"string, requerido, fecha de nacimiento con formato YYYY-MM-DD\"\n                        \"phoneNumber\": \"string, requerido, numero de telefono chileno\"\n                        \"gender\": \"string, requerido, genero del usuario\"\n                      }\n    \n     ```\n    \n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n    _Mensaje de exito. Ejemplo de body:_\n    \n    ``` json\n                    {\n                      \"message\": \"valor\",\n                      \"data\": \"valor\"\n                    }\n    \n     ```\n    \n- **400 Bad Request:**  \n    Campo requerido sin rellenar.\n    \n- **409 Conflict:**  \n    Correo o rut ya registrado.\n    \n- **500 Internal Server Error:**  \n    Error de servidor.\n    \n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+					},
+					"response": []
+				},
+				{
+					"name": "Login de usuario verificado",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var response = pm.response.json();",
+									"pm.collectionVariables.set(\"authToken\", response.data)"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{testUserEmail}}\",\n    \"password\": \"{{testUserPassword}}\",\n    \"rememberMe\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/auth/login",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "## 📄 Propósito\n\nPermite validar las credenciales de un usuario y, en caso de éxito, emite un token de autenticación Bearer en formato JWT. El token devuelto está diseñado para utilizarse en llamadas subsecuentes como mecanismo de autorización, conforme a las prácticas recomendadas de seguridad.\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **Body:**\n    \n    ``` json\n{\n    \"email\": \"string, requerido, correo del usuario\",\n    \"password\": \"string, requerido, contraseña registrada\",\n    \"rememberMe\": \"bool, requerido, flag para mantener el login\"\n}\n     ```\n    \n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n    _Entrega un mensaje de exito y el token de autenticacion. Ejemplo de body:_\n    \n    ``` json\n              {\n                      \"message\": \"mensaje\",\n                      \"data\": \"token\"\n              }\n    \n     ```\n    \n- **400 Bad Request:**  \n    _Campo requerido en blanco._\n    \n- **401 Unauthorized:**  \n    _Email o Password incorrecta._\n    \n- **500 Internal Server Error:**  \n    _Error del servidor._\n    \n\n---\n\n## 📚 Notas adicionales\n\n_\\-_"
+					},
+					"response": []
+				},
+				{
+					"name": "Usuario revisa su perfil con exito",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/user/profile",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user",
+								"profile"
+							]
+						},
+						"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+					},
+					"response": []
+				},
+				{
+					"name": "Usuario intenta cambiar su propio rol sin exito",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/admin/users/1/role",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								"1",
+								"role"
+							]
+						},
+						"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Flujo de compra completo",
+			"item": [
+				{
+					"name": "Login de customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var response = pm.response.json();",
+									"pm.collectionVariables.set(\"authToken\", response.data)"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{testUserEmail}}\",\n    \"password\": \"{{testUserPassword}}\",\n    \"rememberMe\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/auth/login",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "## 📄 Propósito\n\nPermite validar las credenciales de un usuario y, en caso de éxito, emite un token de autenticación Bearer en formato JWT. El token devuelto está diseñado para utilizarse en llamadas subsecuentes como mecanismo de autorización, conforme a las prácticas recomendadas de seguridad.\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **Body:**\n    \n    ``` json\n{\n    \"email\": \"string, requerido, correo del usuario\",\n    \"password\": \"string, requerido, contraseña registrada\",\n    \"rememberMe\": \"bool, requerido, flag para mantener el login\"\n}\n     ```\n    \n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n    _Entrega un mensaje de exito y el token de autenticacion. Ejemplo de body:_\n    \n    ``` json\n              {\n                      \"message\": \"mensaje\",\n                      \"data\": \"token\"\n              }\n    \n     ```\n    \n- **400 Bad Request:**  \n    _Campo requerido en blanco._\n    \n- **401 Unauthorized:**  \n    _Email o Password incorrecta._\n    \n- **500 Internal Server Error:**  \n    _Error del servidor._\n    \n\n---\n\n## 📚 Notas adicionales\n\n_\\-_"
+					},
+					"response": []
+				},
+				{
+					"name": "Listado de productos con filtros",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"const products = json?.data?.products;",
+									"",
+									"const firstId = products[0]?.id;",
+									"pm.expect(firstId, \"first product should have an id\").to.exist;",
+									"",
+									"pm.collectionVariables.set(\"productId\", firstId);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/products?PageNumber=1&PageSize=10&SearchTerm",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "PageNumber",
+									"value": "1"
+								},
+								{
+									"key": "PageSize",
+									"value": "10"
+								},
+								{
+									"key": "SearchTerm",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Visualizar detalles de un producto",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/products/{{productId}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"products",
+								"{{productId}}"
+							]
+						},
+						"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+					},
+					"response": []
+				},
+				{
+					"name": "Agregar el producto al carrito",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "ProductId",
+									"value": "{{productId}}",
+									"type": "text"
+								},
+								{
+									"key": "Quantity",
+									"value": "5",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{URL}}/cart/items",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"cart",
+								"items"
+							]
+						},
+						"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+					},
+					"response": []
+				},
+				{
+					"name": "Ver carrito",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/cart",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"cart"
+							]
+						},
+						"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+					},
+					"response": []
+				},
+				{
+					"name": "Cambio de cantidad en el carrito",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Quantity",
+									"value": "10",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{URL}}/cart/items/{{productId}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"cart",
+								"items",
+								"{{productId}}"
+							]
+						},
+						"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+					},
+					"response": []
+				},
+				{
+					"name": "Realizar pedido",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var response = pm.response.json();",
+									"pm.collectionVariables.set(\"orderId\", response.data)"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/orders",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ver detalles del pedido",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/orders/{{orderId}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"orders",
+								"{{orderId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verificar que el carrito este vacio",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/cart",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"cart"
+							]
+						},
+						"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+					},
+					"response": []
+				},
+				{
+					"name": "Ver historial de pedidos del usuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/orders?PageNumber=1&PageSize=10",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"orders"
+							],
+							"query": [
+								{
+									"key": "PageNumber",
+									"value": "1"
+								},
+								{
+									"key": "PageSize",
+									"value": "10"
+								}
+							]
+						},
+						"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Flujo administrativo",
+			"item": [
+				{
+					"name": "Login de administrador",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var response = pm.response.json();",
+									"pm.collectionVariables.set(\"authUserToken\", response.data)"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@tiendaucn.cl\",\n    \"password\": \"Admin123!\",\n    \"rememberMe\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/auth/login",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "## 📄 Propósito\n\nPermite validar las credenciales de un usuario y, en caso de éxito, emite un token de autenticación Bearer en formato JWT. El token devuelto está diseñado para utilizarse en llamadas subsecuentes como mecanismo de autorización, conforme a las prácticas recomendadas de seguridad.\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **Body:**\n    \n    ``` json\n{\n    \"email\": \"string, requerido, correo del usuario\",\n    \"password\": \"string, requerido, contraseña registrada\",\n    \"rememberMe\": \"bool, requerido, flag para mantener el login\"\n}\n     ```\n    \n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n    _Entrega un mensaje de exito y el token de autenticacion. Ejemplo de body:_\n    \n    ``` json\n              {\n                      \"message\": \"mensaje\",\n                      \"data\": \"token\"\n              }\n    \n     ```\n    \n- **400 Bad Request:**  \n    _Campo requerido en blanco._\n    \n- **401 Unauthorized:**  \n    _Email o Password incorrecta._\n    \n- **500 Internal Server Error:**  \n    _Error del servidor._\n    \n\n---\n\n## 📚 Notas adicionales\n\n_\\-_"
+					},
+					"response": []
+				},
+				{
+					"name": "Crear un nuevo producto",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Title",
+									"value": "asdawd",
+									"type": "text"
+								},
+								{
+									"key": "Description",
+									"value": "asdasdasdas",
+									"type": "text"
+								},
+								{
+									"key": "Price",
+									"value": "9101212",
+									"type": "text"
+								},
+								{
+									"key": "Discount",
+									"value": "90",
+									"type": "text"
+								},
+								{
+									"key": "Stock",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "Status",
+									"value": "Used",
+									"type": "text"
+								},
+								{
+									"key": "CategoryName",
+									"value": "Hey",
+									"type": "text"
+								},
+								{
+									"key": "BrandName",
+									"value": "Hello",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{URL}}/admin/products",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"admin",
+								"products"
+							]
+						},
+						"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+					},
+					"response": []
+				},
+				{
+					"name": "Revisar el producto recien creado",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/admin/products/1",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"admin",
+								"products",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{adminToken}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "POST",
+					"item": [
+						{
+							"name": "POST /auth/login – Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var response = pm.response.json();",
+											"pm.collectionVariables.set(\"authUserToken\", response.data)"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"admin@tiendaucn.cl\",\n    \"password\": \"Admin123!\",\n    \"rememberMe\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/login",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								},
+								"description": "## 📄 Propósito\n\nPermite validar las credenciales de un usuario y, en caso de éxito, emite un token de autenticación Bearer en formato JWT. El token devuelto está diseñado para utilizarse en llamadas subsecuentes como mecanismo de autorización, conforme a las prácticas recomendadas de seguridad.\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **Body:**\n    \n    ``` json\n{\n    \"email\": \"string, requerido, correo del usuario\",\n    \"password\": \"string, requerido, contraseña registrada\",\n    \"rememberMe\": \"bool, requerido, flag para mantener el login\"\n}\n     ```\n    \n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n    _Entrega un mensaje de exito y el token de autenticacion. Ejemplo de body:_\n    \n    ``` json\n              {\n                      \"message\": \"mensaje\",\n                      \"data\": \"token\"\n              }\n    \n     ```\n    \n- **400 Bad Request:**  \n    _Campo requerido en blanco._\n    \n- **401 Unauthorized:**  \n    _Email o Password incorrecta._\n    \n- **500 Internal Server Error:**  \n    _Error del servidor._\n    \n\n---\n\n## 📚 Notas adicionales\n\n_\\-_"
+							},
+							"response": []
+						},
+						{
+							"name": "POST /auth/register – Register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"srg004@alumnos.ucn.cl\",\n    \"password\": \"nuevoUsuario1!\",\n    \"confirmPassword\": \"nuevoUsuario1!\",\n    \"rut\": \"18791125-7\",\n    \"firstName\": \"Holi\",\n    \"lastName\": \" Hola\",\n    \"birthDate\": \"1995-05-05\",\n    \"phoneNumber\": \"123456789\",\n    \"gender\": \"Masculino\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/register",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								},
+								"description": "## 📄 Propósito\n\nContiene las variables necesarias para un registro exitoso y en caso de exito devuelve un mensaje de exito. Por medio de el backend se envia un correo con un codigo de verificacion para ser usado en llamadas subsecuentes.\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **Body:**\n    \n    ``` json\n                      {\n                        \"email\": \"string, requerido, correo del usuario\",\n                        \"password\": \"string, requerido contraseña\"\n                        \"confirmPassword\": \"string, requerido, confirmacion de contraseña\"\n                        \"rut\": \"string, requerido, rut del usuario\"\n                        \"firstName\": \"string, requerido/, nombre del usuario\"\n                        \"lastName\": \"string, requerido, apellido del usuario\"\n                        \"birthDate\": \"string, requerido, fecha de nacimiento con formato YYYY-MM-DD\"\n                        \"phoneNumber\": \"string, requerido, numero de telefono chileno\"\n                        \"gender\": \"string, requerido, genero del usuario\"\n                      }\n    \n     ```\n    \n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n    _Mensaje de exito. Ejemplo de body:_\n    \n    ``` json\n                    {\n                      \"message\": \"valor\",\n                      \"data\": \"valor\"\n                    }\n    \n     ```\n    \n- **400 Bad Request:**  \n    Campo requerido sin rellenar.\n    \n- **409 Conflict:**  \n    Correo o rut ya registrado.\n    \n- **500 Internal Server Error:**  \n    Error de servidor.\n    \n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						},
+						{
+							"name": "POST /auth/recover-password – Recover Password",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"srg004@alumnos.ucn.cl\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/recover-password",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"recover-password"
+									]
+								},
+								"description": "## 📄 Propósito\n\nPermite resetear la contraseña de una cuenta de usuario por medio de un codigo de verificacion enviado al correo registrado en la cuenta.\n\nRecover Password acepta un correo y en caso de exito envia un codigo de verificacion de reseteo de contraseña.\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **Body:**\n    \n    ``` json\n              {\n                \"email\": \"string, requerido, correo del usuario\"\n              }\n    \n     ```\n    \n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n    _Mensaje de exito. Ejemplo de body:_\n    \n    ``` json\n              {\n                \"message\": \"valor\",\n                \"data\": \"valor\"\n              }\n    \n     ```\n    \n- **400 Bad Request:**  \n    Campo requerido sin rellenar.\n    \n- **404 Not Found:**  \n    Si no se encuentra el email entregado.\n\n- **409 Conflict:**  \n    Si el usuario no ha verificado su correo.\n    \n- **500 Internal Server Error:**  \n    Error de servidor.\n    \n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						},
+						{
+							"name": "POST /auth/verify-email – Verify Email",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"srg004@alumnos.ucn.cl\",\n    \"verificationCode\": \"131751\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/verify-email",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"verify-email"
+									]
+								},
+								"description": "## 📄 Propósito\n\nPermite activar la cuenta de un usuario por medio de un codigo de verificacion. Como los codigos de verificacion tienen un tiempo de expiracion implementado.\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **Body:**\n    \n    ``` json\n          {\n            \"email\": \"string, requerido, correo del usuario\",\n            \"verificationCode\": \"string, requerido, codigo de verificacion\"\n          }\n    \n     ```\n    \n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n    _Descripción de la respuesta exitosa. Ejemplo de body:_\n    \n    ``` json\n                {\n                  \"message\": \"valor\",\n                  \"data\": \"valor\"\n                }\n    \n     ```\n    \n- **400 Bad Request:**  \n    Campo requerido sin rellenar.\n    Codigo de verificacion expirado\n    \n- **404 Not Found:**  \n    Correo no encontrado.\n    \n- **500 Internal Server Error:**  \n    Error del servidor\n    \n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						},
+						{
+							"name": "POST /auth/resend-verify-email – Resend Verification Email",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"srg004@alumnos.ucn.cl\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/resend-verify-email",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"resend-verify-email"
+									]
+								},
+								"description": "## 📄 Propósito\n\nPermite reenviar el codigo de verificacion por correo. Si el codigo ha expirado se entrega uno nuevo.\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **Body:**\n    \n    ``` json\n                    {\n                      \"email\": \"string, requerido, correo del usuario\"\n                    }\n    \n     ```\n    \n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n    Mensaje de exito. Ejemplo de body:_\n    \n    ``` json\n                    {\n                      \"message\": \"valor\",\n                      \"data\": \"valor\"\n                    }\n    \n     ```\n    \n- **400 Bad Request:**  \n    Campo requerido no rellenado\n    \n- **404 Not Found:**  \n    El correo no fue encontrado.\n    \n- **500 Internal Server Error:**  \n    Error del servidor.\n    \n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos POST"
+				},
+				{
+					"name": "PATCH",
+					"item": [
+						{
+							"name": "PATCH /auth/reset-password – Reset Password",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"srg004@alumnos.ucn.cl\",\n    \"code\": \"987413\",\n    \"newPassword\": \"nuevoUsuario3!\",\n    \"confirmNewPassword\": \"nuevoUsuario3!\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/reset-password",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"reset-password"
+									]
+								},
+								"description": "## 📄 Propósito\n\nReset Password toma este codigo de verificacion junto al correo al que se le envio y la nueva contraseña y su confirmacion.\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **Body:**\n    \n    ``` json\n              {\n                \"email\": \"string, requerido, correo del usuario\",\n                \"code\": \"string, requerido, codigo de verificacion\",\n                \"newPassword\": \"string, requerido, nueva contraseña\",\n                \"confirmNewPassword\": \"string, requerido, confirmacion de la nueva contraseña\"\n              }\n    \n     ```\n    \n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n    Mensaje de exito. Ejemplo de body:\n    \n    ``` json\n      {\n        \"message\": \"valor\",\n        \"data\": \"valor\"\n      }\n    \n     ```\n    \n- **400 Bad Request:**  \n    Campo requerido no rellenado.\n    Codigo de verificacion caducado.\n    \n- **404 Not Found:**  \n    Codigo o correo no encontrado.\n\n- **409 Conflict:**\n    Correo sin verificar.\n    \n- **500 Internal Server Error:**  \n   Error de servidor.\n    \n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos PATCH"
+				}
+			],
+			"description": "Esta carpeta contiene el Flujo 1, con los endpoints para:\n\n- Login de usuario\n    \n- Registro de usuario\n    \n- Verificacion de email y reenvio de codigo de verificacion\n    \n- Recuperacion y reseteo de contraseña olvidada"
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "GET",
+					"item": [
+						{
+							"name": "GET /user/profile – View Profile",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQHRpZW5kYXVjbi5jbCIsImV4cCI6MTc2MjAzODI4Nn0.YRrWb5r5rwdamrmcXbCEKKp1uCPD5rGP9jCm_TmiohM",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/user/profile",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"user",
+										"profile"
+									]
+								},
+								"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos GET"
+				},
+				{
+					"name": "PUT",
+					"item": [
+						{
+							"name": "PUT /user/profile – Edit Profile",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQHRpZW5kYXVjbi5jbCIsImV4cCI6MTc2MTk1Nzc5NH0.ncd_n1C1JY7b6UlspaYQst3zaX_NMaF88PeSeARxvFU",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"Nuevo\",\n    \"email\": \"srg004@alumnos.ucn.cl\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/user/profile",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"user",
+										"profile"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos PUT"
+				},
+				{
+					"name": "PATCH",
+					"item": [
+						{
+							"name": "PATCH /user/change-password – Change Password",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQHRpZW5kYXVjbi5jbCIsImV4cCI6MTc2MjAzODI4Nn0.YRrWb5r5rwdamrmcXbCEKKp1uCPD5rGP9jCm_TmiohM",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"CurrentPassword\": \"Admin123!\",\n    \"NewPassword\": \"Admin1234!\",\n    \"ConfirmNewPassword\": \"Admin1234!\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/user/change-password",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"user",
+										"change-password"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos PATCH"
+				}
+			],
+			"description": "Esta carpeta contiene los modulos requeridos para la gestion de la cuenta de usuario y contempla la capacidad para ver y editar los datos de sus perfiles y el cambio de contraseña.\n\nContiene los modulos:\n\n- Obtencion de datos del perfil de usuario\n    \n- Actualizacion de datos del perfil de usuario\n    \n- Cambio de contraseña\n    \n\n## Obtencion de datos del perfil del usuario\n\nEste modulo contiene el endpoint View Profile que realiza la operacion capaz de extraer los datos requeridos desde la base de datos correspondientes al perfil del usuario.\n\nRequiere que el usuario este autenticado y este solo puede ver los datos de su propio perfil.\n\n## Actualizacion de datos del perfil de usuario\n\nEste modulo contiene el endpoint Edit Profile que realiza la operacion capaz de actualizar los datos ingresados en la base de datos correspondientes al perfil del usuario.\n\nRequiere que el usuario este autenticado y este solo puede actualizar los datos de su propio perfil.\n\n## Cambio de contraseña\n\nEste modulo contiene al endpoint Change Password y permite al usuario autenticado el cambio de una contraseña por otra.\n\nRequiere la autenticacion del usuario y en caso de exito se implementa un logout por medio de revocacion del token, lo que requiere de un nuevo login antes de realizar otra operacion."
+		},
+		{
+			"name": "Cart",
+			"item": [
+				{
+					"name": "GET",
+					"item": [
+						{
+							"name": "GET /cart – View Cart",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/cart",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"cart"
+									]
+								},
+								"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos GET"
+				},
+				{
+					"name": "POST",
+					"item": [
+						{
+							"name": "POST /cart/items – Add Item to Cart",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/cart/items",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"cart",
+										"items"
+									]
+								},
+								"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos POST"
+				},
+				{
+					"name": "PUT",
+					"item": [
+						{
+							"name": "PUT /cart/items/1 – Change Item Quantity",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/cart/items/{{productId}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"cart",
+										"items",
+										"{{productId}}"
+									]
+								},
+								"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos PUT"
+				},
+				{
+					"name": "DELETE",
+					"item": [
+						{
+							"name": "DELETE /cart/items/1 – Delete Item from Cart",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/cart/items/{{productId}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"cart",
+										"items",
+										"{{productId}}"
+									]
+								},
+								"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos DELETE"
+				}
+			],
+			"description": "Esta carpeta contiene todos los endpoints necesarios para implementar la gestion de un carrito de compras."
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "GET",
+					"item": [
+						{
+							"name": "GET /orders – View Order",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/orders",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"orders"
+									]
+								},
+								"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						},
+						{
+							"name": "GET /orders/1 – View Order Details",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/orders/{{orderId}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"orders",
+										"{{orderId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos GET"
+				},
+				{
+					"name": "POST",
+					"item": [
+						{
+							"name": "POST /orders – Create Order",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/orders",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos POST"
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "GET",
+					"item": [
+						{
+							"name": "GET /products – View All Available Products",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/products?PageNumber=2&PageSize=10",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"products"
+									],
+									"query": [
+										{
+											"key": "PageNumber",
+											"value": "2"
+										},
+										{
+											"key": "PageSize",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET /products/1 – View Product",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/products/{{productId}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"products",
+										"{{productId}}"
+									]
+								},
+								"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos GET"
+				}
+			]
+		},
+		{
+			"name": "Admin/Products",
+			"item": [
+				{
+					"name": "GET",
+					"item": [
+						{
+							"name": "GET /admin/products – Get Available Products For Admin",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{Token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/admin/products?PageNumber=2&PageSize=10",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"admin",
+										"products"
+									],
+									"query": [
+										{
+											"key": "PageNumber",
+											"value": "2"
+										},
+										{
+											"key": "PageSize",
+											"value": "10"
+										}
+									]
+								},
+								"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						},
+						{
+							"name": "GET /admin/products/1 – Get Product By Id For Admin",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{Token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/admin/products/1",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"admin",
+										"products",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos GET"
+				},
+				{
+					"name": "POST",
+					"item": [
+						{
+							"name": "POST /admin/products – Create Product",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{Token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "Title",
+											"value": "asdawd",
+											"type": "text"
+										},
+										{
+											"key": "Description",
+											"value": "asdasdasdas",
+											"type": "text"
+										},
+										{
+											"key": "Price",
+											"value": "9101212",
+											"type": "text"
+										},
+										{
+											"key": "Discount",
+											"value": "90",
+											"type": "text"
+										},
+										{
+											"key": "Stock",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "Status",
+											"value": "Used",
+											"type": "text"
+										},
+										{
+											"key": "CategoryName",
+											"value": "Hey",
+											"type": "text"
+										},
+										{
+											"key": "BrandName",
+											"value": "Hello",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{URL}}/admin/products",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"admin",
+										"products"
+									]
+								},
+								"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos POST"
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{adminToken}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin/Brands",
+			"item": [
+				{
+					"name": "GET /brand/admin/brands",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\" : \"MiCategoria\"}"
+						},
+						"url": {
+							"raw": "{{URL}}/brand/admin/brands",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"brand",
+								"admin",
+								"brands"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET  /brand/admin/{id}",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\" : \"MiCategoria\"}"
+						},
+						"url": {
+							"raw": "{{URL}}/brand/admin/5",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"brand",
+								"admin",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST  /brand",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\" : \"MiMarca\"}"
+						},
+						"url": {
+							"raw": "{{URL}}/brand",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"brand"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH  /brand/{id}",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"NuevaMarca\"}"
+						},
+						"url": {
+							"raw": "{{URL}}/brand/5",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"brand",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE  /brand/{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"NuevaMarca\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/brand/5",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"brand",
+								"5"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{adminToken}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin/Categories",
+			"item": [
+				{
+					"name": "GET /admin/categories - View all categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/admin/categories?PageNumber=1&PageSize=10&Nam",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"admin",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "PageNumber",
+									"value": "1"
+								},
+								{
+									"key": "PageSize",
+									"value": "10"
+								},
+								{
+									"key": "Nam",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /admin/categories/{id}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/category/admin/1",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"category",
+								"admin",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /category",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\" : \"MiCategoria\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/admin/category",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"admin",
+								"category"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH /category/{id}",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\" : \"NuevaCategoria\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/category/5",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"category",
+								"5"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{adminToken}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin/Users",
+			"item": [
+				{
+					"name": "GET",
+					"item": [
+						{
+							"name": "GET /admin/users – View All Users",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/admin/users?PageNumber=4&PageSize=33&SearchTerm=&Role=&State=&SortOrder=ascending&SortBy=",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"admin",
+										"users"
+									],
+									"query": [
+										{
+											"key": "PageNumber",
+											"value": "4"
+										},
+										{
+											"key": "PageSize",
+											"value": "33"
+										},
+										{
+											"key": "SearchTerm",
+											"value": ""
+										},
+										{
+											"key": "Role",
+											"value": ""
+										},
+										{
+											"key": "State",
+											"value": ""
+										},
+										{
+											"key": "SortOrder",
+											"value": "ascending"
+										},
+										{
+											"key": "SortBy",
+											"value": ""
+										}
+									]
+								},
+								"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						},
+						{
+							"name": "GET /admin/users/2 – View A Specific User",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/admin/users/2",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"admin",
+										"users",
+										"2"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos GET"
+				},
+				{
+					"name": "PATCH",
+					"item": [
+						{
+							"name": "PATCH /admin/users/100/status – Block or Unblock User",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": \"Active\",\n    \"reason\": \"Testing purposes\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/admin/users/100/status",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"admin",
+										"users",
+										"100",
+										"status"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "PATCH /admin/users/1/role – Update User Role",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/admin/users/1/role",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"admin",
+										"users",
+										"1",
+										"role"
+									]
+								},
+								"description": "## 📄 Propósito\n\n_Describe aquí el objetivo de este endpoint. ¿Qué acción realiza? ¿En qué contexto se usa?_\n\n---\n\n## 📝 Parámetros / Body esperados\n\n- **URL Params:**  \n  - `param1` (tipo, requerido/opcional): Descripción  \n  - `param2` (tipo, requerido/opcional): Descripción\n\n- **Query Params:**  \n  - `query1` (tipo, requerido/opcional): Descripción  \n  - `query2` (tipo, requerido/opcional): Descripción\n\n- **Headers:**  \n  - `Header-Name` (requerido/opcional): Descripción\n\n- **Body:**  \n  ```json\n  {\n    \"campo1\": \"tipo, requerido/opcional, descripción\",\n    \"campo2\": \"tipo, requerido/opcional, descripción\"\n  }\n  ```\n\n---\n\n## 🔄 Códigos de respuesta típicos\n\n- **200 OK:**  \n  _Descripción de la respuesta exitosa. Ejemplo de body:_\n  ```json\n  {\n    \"ejemplo\": \"valor\"\n  }\n  ```\n\n- **400 Bad Request:**  \n  _Descripción de cuándo ocurre este error._\n\n- **401 Unauthorized:**  \n  _Descripción de cuándo ocurre este error._\n\n- **404 Not Found:**  \n  _Descripción de cuándo ocurre este error._\n\n- **500 Internal Server Error:**  \n  _Descripción de cuándo ocurre este error._\n\n---\n\n## 📚 Notas adicionales\n\n_Agrega aquí cualquier información relevante, dependencias, advertencias o enlaces a documentación externa._"
+							},
+							"response": []
+						}
+					],
+					"description": "Subcarpeta con todos los metodos PATCH"
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{adminToken}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin/Orders",
+			"item": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": "http://localhost:5000/api",
+			"description": {
+				"content": "Development URL for testing",
+				"type": "text/plain"
+			}
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"description": {
+				"content": "JWT for a non-admin user",
+				"type": "text/plain"
+			}
+		},
+		{
+			"key": "adminToken",
+			"value": "",
+			"description": {
+				"content": "JWT for an admin",
+				"type": "text/plain"
+			}
+		},
+		{
+			"key": "currentUserId",
+			"value": ""
+		},
+		{
+			"key": "productId",
+			"value": ""
+		},
+		{
+			"key": "orderId",
+			"value": ""
+		},
+		{
+			"key": "cartId",
+			"value": ""
+		},
+		{
+			"key": "cartItemId",
+			"value": ""
+		},
+		{
+			"key": "testUserEmail",
+			"value": "customer@tiendaucn.cl"
+		},
+		{
+			"key": "testUserPassword",
+			"value": "Customer123!"
+		},
+		{
+			"key": "testAdminEmail",
+			"value": "admin@tiendaucn.cl"
+		},
+		{
+			"key": "testAdminPassword",
+			"value": "Admin123!"
+		},
+		{
+			"key": "testProductName",
+			"value": ""
+		},
+		{
+			"key": "testProductPrice",
+			"value": ""
+		},
+		{
+			"key": "authUserToken",
+			"value": ""
+		}
+	]
+}
