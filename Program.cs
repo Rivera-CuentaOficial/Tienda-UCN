@@ -111,7 +111,7 @@ builder.Services.AddIdentityCore<User>(options =>
 .AddDefaultTokenProviders();
 #endregion
 
-# region Logging Configuration
+#region Logging Configuration
 builder.Host.UseSerilog((context, services, configuration) => configuration
     .ReadFrom.Configuration(context.Configuration)
     .ReadFrom.Services(services));
