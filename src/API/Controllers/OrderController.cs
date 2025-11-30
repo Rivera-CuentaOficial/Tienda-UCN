@@ -36,7 +36,7 @@ namespace TiendaUCN.src.API.Controllers
             int.TryParse(userId, out int parsedUserId);
             var result = await _orderService.CreateAsync(parsedUserId);
             return Created(
-                $"api/{result}",
+                $"api/orders/{result}",
                 new GenericResponse<string>("Orden creada exitosamente", result)
             );
         }
