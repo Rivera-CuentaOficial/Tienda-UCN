@@ -75,6 +75,7 @@ public class ProductRepository : IProductRepository
             .Include(p => p.Category)
             .Include(p => p.Brand)
             .Include(p => p.Images.OrderBy(i => i.CreatedAt).Take(1))
+            .AsSplitQuery()
             .AsNoTracking();
         if (query == null)
         {

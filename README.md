@@ -63,6 +63,20 @@ Una vez que los requerimientos esten instalados, se puede proceder a clonar el r
 ```bash
     dotnet run
 ```
+
+# Usage
+La base de datos esta configurada con los siguientes usuarios:
+
+## Usuarios de Prueba
+
+| Email | Contraseña | Rol |
+|-------|------------|-----|
+| admin@tiendaucn.cl | Admin123! | Admin |
+| customer@tiendaucn.cl | Customer123! | Customer |
+
+
+**Nota:** Estos usuarios son creados automáticamente por el seeder al ejecutar el proyecto por primera vez.
+
 # Postman
 Se incluye un archivo de coleccion de Postman para realizar pruebas.
 

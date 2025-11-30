@@ -20,7 +20,7 @@ namespace TiendaUCN.src.API.Middlewares
             if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
             {
                 var token = authHeader.Replace("Bearer ", "");
-                var isBlacklisted = await tokenService.IsTokenBlacklisted(token);
+                /*var isBlacklisted = await tokenService.IsTokenBlacklisted(token);
                 if (isBlacklisted)
                 {
                     Log.Warning("Intento de acceso con token bloqueado.");
@@ -37,8 +37,8 @@ namespace TiendaUCN.src.API.Middlewares
                     
                     await context.Response.WriteAsync(json);
 
-                    return;*/
-                }
+                    return;
+                }*/
             }
             await _next(context);
         }
