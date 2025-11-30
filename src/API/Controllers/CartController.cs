@@ -100,7 +100,7 @@ namespace TiendaUCN.src.API.Controllers
         /// </summary>
         /// <param name="changeItemQuantityDTO">Id del item y cantidad nueva</param>
         /// <returns>Resultado con el carrito de compras actualizado.</returns>
-        [HttpPut("items/{productId}")]
+        [HttpPatch("items/{productId}")]
         [AllowAnonymous]
         public async Task<IActionResult> UpdateItemQuantity(
             int productId,

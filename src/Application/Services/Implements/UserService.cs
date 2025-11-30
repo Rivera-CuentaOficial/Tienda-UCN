@@ -563,12 +563,12 @@ public class UserService : IUserService
             throw new InvalidOperationException("No se pudo actualizar la contraseña.");
         }
         Log.Information($"Contraseña actualizada para el usuario ID: {userId}", userId);
-        var blacklistToken = await _tokenService.AddTokenToBlacklist(token, userId, expiration);
+        /*var blacklistToken = await _tokenService.AddTokenToBlacklist(token, userId, expiration);
         if (!blacklistToken)
         {
             Log.Warning($"No se pudieron invalidar los tokens para el usuario ID: {userId}");
             throw new InvalidOperationException("No se pudieron invalidar los tokens.");
-        }
+        }*/
         return "Contraseña cambiada exitosamente.";
     }
 

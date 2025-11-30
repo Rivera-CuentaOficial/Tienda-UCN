@@ -45,6 +45,7 @@ namespace TiendaUCN.src.Infrastructure.Repositories.Implements
                 .Carts.Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
                 .ThenInclude(p => p.Images)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(c => c.BuyerId == buyerId && c.UserId == null);
 
             if (cart != null && userId.HasValue)
@@ -102,6 +103,7 @@ namespace TiendaUCN.src.Infrastructure.Repositories.Implements
                 .Carts.Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
                 .ThenInclude(p => p.Images)
+                .AsSingleQuery()
                 .FirstAsync(c => c.Id == cart.Id);
         }
 

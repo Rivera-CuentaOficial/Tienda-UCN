@@ -11,11 +11,10 @@ namespace TiendaUCN.src.Application.Services.Implements;
 public class TokenService : ITokenService
 {
     private readonly IConfiguration _configuration;
-    private readonly IBlacklistedTokensRepository _blacklistedTokensRepository;
 
     private readonly string _jwtSecret;
 
-    public TokenService(IConfiguration configuration, IBlacklistedTokensRepository blacklistedTokensRepository)
+    public TokenService(IConfiguration configuration)
     {
         _configuration =
             configuration
@@ -23,7 +22,7 @@ public class TokenService : ITokenService
                 nameof(configuration),
                 "La configuración no puede ser nula."
             );
-        _blacklistedTokensRepository = blacklistedTokensRepository;
+
         _jwtSecret =
             _configuration["JWTSecret"]
             ?? throw new InvalidOperationException("La clave JWTSecret no está configurada.");
@@ -60,7 +59,7 @@ public class TokenService : ITokenService
         }
     }
 
-    public async Task<bool> IsTokenBlacklisted(string token)
+    /*public async Task<bool> IsTokenBlacklisted(string token)
     {
         return await _blacklistedTokensRepository.IsBlacklistedAsync(token);
     }
@@ -75,5 +74,5 @@ public class TokenService : ITokenService
         };
 
         return await _blacklistedTokensRepository.AddTokenAsync(blacklistedToken);
-    }
+    }*/
 }
