@@ -13,6 +13,15 @@
 *.userosscache
 *.sln.docstates
 
+#SQlite files
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+*.sqlite-shm
+*.sqlite-wal
+
 #User-specific folders
 [Oo]bj/
 [Bb]in/
