@@ -176,7 +176,7 @@ namespace TiendaUCN.src.API.Controllers
             {
                 throw new KeyNotFoundException("Producto no encontrado.");
             }
-            return Ok(new GenericResponse<ProductDetailDTO>("Producto obtenido exitosamente", result));
+            return Ok(new GenericResponse<ProductDetailForAdminDTO>("Producto obtenido exitosamente", result));
         }
 
         /// <summary>
@@ -193,6 +193,60 @@ namespace TiendaUCN.src.API.Controllers
                 $"/api/product/{result}",
                 new GenericResponse<string>("Producto creado exitosamente", result)
             );
+        }
+
+        /// <summary>
+        /// Actualiza un producto existente.
+        /// </summary>
+        /// <param name="id">El ID del producto a actualizar.</param>
+        /// <param name="updateProductDTO">Los datos actualizados del producto.</param>
+        /// <returns>El ID del producto actualizado.</returns>
+        [HttpPut("products/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateAsync(int id, [FromForm] UpdateProductDTO updateProductDTO)
+        {
+            var result = await _productService.UpdateAsync(id, updateProductDTO);
+            return Ok(new GenericResponse<string>("Producto actualizado exitosamente", result));
+        }
+
+        /// <summary>
+        /// Elimina un producto por su ID.
+        /// </summary>
+        /// <param name="id">El ID del producto a eliminar.</param>
+        /// <returns>Mensaje de confirmación de eliminación.</returns>
+        [HttpDelete("products/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            var deleteResult = await _productService.DeleteAsync(id);
+            return Ok(new GenericResponse<string>("Producto eliminado exitosamente", deleteResult));
+        }
+
+        /// <summary>
+        /// Actualiza el descuento de un producto.  
+        /// </summary>
+        /// <param name="id">El ID del producto a actualizar el descuento.</param>
+        /// <param name="updateProductDiscountDTO">Los datos actualizados del descuento del producto.</param>
+        /// <returns>El ID del producto con el descuento actualizado.</returns>
+        [HttpPatch("products/{id}/discount")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateProductDiscountAsync(int id, [FromBody] UpdateProductDiscountDTO updateProductDiscountDTO)
+        {
+            var result = await _productService.UpdateProductDiscountAsync(id, updateProductDiscountDTO);
+            return Ok(new GenericResponse<string>("Descuento del producto actualizado exitosamente", result));
+        }
+
+        /// <summary>
+        /// Alterna el estado de disponibilidad de un producto.
+        /// </summary>
+        /// <param name="id">El ID del producto cuyo estado se alternará.</param>
+        /// <returns>El ID del producto con el estado alternado.</returns>
+        [HttpPatch("products/{id}/toggle-status")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ToggleProductStatusAsync(int id)
+        {
+            var result = await _productService.ToggleActiveAsync(id);
+            return Ok(new GenericResponse<string>("Estado del producto cambiado exitosamente", result));
         }
 
         #endregion
@@ -253,7 +307,7 @@ namespace TiendaUCN.src.API.Controllers
 
         [HttpDelete("categories/{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteAsync(int id)
+        public async Task<IActionResult> DeleteCategoryAsync(int id)
         {
             var category = await _context.Categories.FindAsync(id) ?? throw new KeyNotFoundException("Categoría no encontrada.");
             var inUse = await _context.Products.AnyAsync(p => p.CategoryId == id);

@@ -310,6 +310,7 @@ namespace TiendaUCN.src.Infrastructure.Data
                             .RuleFor(p => p.Description, f => f.Commerce.ProductDescription())
                             .RuleFor(p => p.Price, f => f.Random.Int(1000, 100000))
                             .RuleFor(p => p.Stock, f => f.Random.Int(1, 100))
+                            .RuleFor(p => p.Discount, f => f.Random.Int(0, 50))
                             .RuleFor(p => p.CategoryId, f => f.PickRandom(categoryIds))
                             .RuleFor(p => p.BrandId, f => f.PickRandom(brandIds))
                             .RuleFor(p => p.Status, f => f.PickRandom<Status>());
