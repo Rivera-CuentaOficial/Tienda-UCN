@@ -120,13 +120,6 @@ public class ProductMapper
             .Map(dest => dest.Price, src => src.Price)
             .Map(dest => dest.Stock, src => src.Stock)
             .Map(dest => dest.Status, src => src.Status);
-
-        TypeAdapterConfig<UpdateProductDTO, Product>
-            .NewConfig()
-            .Map(dest => dest.Title, src => src.Title)
-            .Map(dest => dest.Description, src => src.Description)
-            .Map(dest => dest.Price, src => src.Price)
-            .Map(dest => dest.Stock, src => src.Stock);
     }
 
     private string GetStockIndicator(int stock)

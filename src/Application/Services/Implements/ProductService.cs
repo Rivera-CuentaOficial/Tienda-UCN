@@ -175,23 +175,32 @@ public class ProductService : IProductService
             ?? throw new KeyNotFoundException($"Producto con ID {id} no encontrado.");
 
         // Actualizar la categoría si es necesario
-        if (existingProduct.CategoryId != updateProductDTO.CategoryId && updateProductDTO.CategoryId.HasValue)
+        if (existingProduct.Category.Name != updateProductDTO.CategoryName && updateProductDTO.CategoryName != null)
         {
             // Verificar si la nueva categoría existe
-            var category = await _categoryRepository.GetByIdAsync(updateProductDTO.CategoryId.Value);
-            if (category == null) Log.Warning($"La categoría con ID {updateProductDTO.CategoryId.Value} no existe.");
+            var category = await _categoryRepository.GetByNameAsync(updateProductDTO.CategoryName);
+            if (category == null)
+            {
+                Log.Warning($"La categoría con nombre {updateProductDTO.CategoryName} no existe.");
+                category = await _categoryRepository.CreateOrGetCategoryAsync(updateProductDTO.CategoryName);
+            }
 
-            existingProduct.CategoryId = updateProductDTO.CategoryId.Value;
+            existingProduct.CategoryId = category.Id;
+            existingProduct.Category = category;
         }
 
         // Actualizar la marca si es necesario
-        if (existingProduct.BrandId != updateProductDTO.BrandId && updateProductDTO.BrandId.HasValue)
+        if (existingProduct.Brand.Name != updateProductDTO.BrandName && updateProductDTO.BrandName != null)
         {
             // Verificar si la nueva marca existe
-            var brand = await _brandRepository.GetByIdAsync(updateProductDTO.BrandId.Value);
-            if (brand == null) Log.Warning($"La marca con ID {updateProductDTO.BrandId.Value} no existe.");
-
-            existingProduct.BrandId = updateProductDTO.BrandId.Value;
+            var brand = await _brandRepository.GetByNameAsync(updateProductDTO.BrandName);
+            if (brand == null)
+            {
+                Log.Warning($"La marca con nombre {updateProductDTO.BrandName} no existe.");
+                brand = await _brandRepository.CreateOrGetBrandAsync(updateProductDTO.BrandName);
+            }
+            existingProduct.BrandId = brand.Id;
+            existingProduct.Brand = brand;
         }
 
         // Actualizar las imagenes si se proporcionan nuevas imágenes
@@ -200,7 +209,8 @@ public class ProductService : IProductService
             // Eliminar las imágenes existentes del producto
             if (existingProduct.Images != null && existingProduct.Images.Any())
             {
-                foreach (var image in existingProduct.Images)
+                var images = existingProduct.Images.ToList();
+                foreach (var image in images)
                 {
                     Log.Information("Eliminando imagen existente asociada al producto: {ImageUrl}", image.ImageUrl);
                     var result = await _fileService.DeleteAsync(image.PublicId);
@@ -210,6 +220,7 @@ public class ProductService : IProductService
                         throw new Exception($"No se pudo eliminar la imagen: {image.ImageUrl}");
                     }
                 }
+                existingProduct.Images.Clear();
             }
 
             // Subir las nuevas imágenes y asociarlas al producto
@@ -226,7 +237,14 @@ public class ProductService : IProductService
         }
 
         // Actualizar las propiedades del producto existente con los valores del DTO
-        updateProductDTO.Adapt(existingProduct);
+        if (updateProductDTO.Title != null && existingProduct.Title != updateProductDTO.Title)
+            existingProduct.Title = updateProductDTO.Title;
+        if (updateProductDTO.Description != null && existingProduct.Description != updateProductDTO.Description)
+            existingProduct.Description = updateProductDTO.Description;
+        if (updateProductDTO.Price.HasValue && existingProduct.Price != updateProductDTO.Price.Value)
+            existingProduct.Price = updateProductDTO.Price.Value;
+        if (updateProductDTO.Stock.HasValue && existingProduct.Stock != updateProductDTO.Stock.Value)
+            existingProduct.Stock = updateProductDTO.Stock.Value;
 
         await _productRepository.UpdateAsync(existingProduct);
         Log.Information("Producto actualizado: {@Product}", existingProduct);

@@ -32,6 +32,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<bool> UpdateAsync(Product existingProduct)
     {
+        existingProduct.UpdatedAt = DateTime.UtcNow;
         return await _context.SaveChangesAsync() > 0;
     }
 
@@ -138,7 +139,10 @@ public class ProductRepository : IProductRepository
     {
         return await _context
             .Products.Where(p => p.Id == product.Id)
-            .ExecuteUpdateAsync(p => p.SetProperty(p => p.IsAvailable, p => !p.IsAvailable)) > 0;
+            .ExecuteUpdateAsync(p => p
+                .SetProperty(p => p.IsAvailable, p => !p.IsAvailable)
+                .SetProperty(p => p.UpdatedAt, p => DateTime.UtcNow)
+            ) > 0;
     }
 
     public async Task<int> GetRealStockAsync(int productId)
@@ -155,7 +159,10 @@ public class ProductRepository : IProductRepository
         await _context
             .Products
             .Where(p => p.Id == productId)
-            .ExecuteUpdateAsync(p => p.SetProperty(p => p.Stock, p => stock));
+            .ExecuteUpdateAsync(p => p
+                .SetProperty(p => p.Stock, p => stock)
+                .SetProperty(p => p.UpdatedAt, p => DateTime.UtcNow)
+            );
     }
 
     public async Task<int> CountProductsByCategoryIdAsync(int categoryId)

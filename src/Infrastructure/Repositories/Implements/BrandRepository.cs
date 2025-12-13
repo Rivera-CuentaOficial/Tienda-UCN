@@ -61,6 +61,14 @@ namespace TiendaUCN.src.Infrastructure.Repositories.Implements
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<Brand?> GetByNameAsync(string brandName)
+        {
+            return await _context.Brands
+                .Where(b => b.Name.ToLower() == brandName.ToLower())
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<Brand> CreateOrGetBrandAsync(string brandName)
         {
             var brand = await _context

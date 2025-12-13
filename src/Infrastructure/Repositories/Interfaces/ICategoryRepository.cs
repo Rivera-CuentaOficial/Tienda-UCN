@@ -7,6 +7,7 @@ namespace TiendaUCN.src.Infrastructure.Repositories.Interfaces
     {
         Task<(IEnumerable<Category> categories, int totalCount)> GetFilteredForAdminAsync(CategorySearchTermDTO searchParams);
         Task<Category?> GetByIdAsync(int id);
+        Task<Category?> GetByNameAsync(string categoryName);
         Task<Category> CreateOrGetCategoryAsync(string categoryName);
     }
 }

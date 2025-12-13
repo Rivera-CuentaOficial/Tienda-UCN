@@ -11,11 +11,11 @@ namespace TiendaUCN.src.Application.DTOs.ProductResponse.AdminDTO
         [MinLength(10, ErrorMessage = "La descripción debe tener al menos 10 caracteres.")]
         public string? Description { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "El precio debe ser un valor entero positivo.")]
-        public decimal? Price { get; set; }
+        public int? Price { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "El stock debe ser un valor positivo.")]
         public int? Stock { get; set; }
-        public int? CategoryId { get; set; }
-        public int? BrandId { get; set; }
+        public string? CategoryName { get; set; }
+        public string? BrandName { get; set; }
         public List<IFormFile>? Images { get; set; } = new List<IFormFile>();
     }
 }
