@@ -119,13 +119,13 @@ public class ProductService : IProductService
         return product.Adapt<ProductDetailDTO>();
     }
 
-    public async Task<ProductDetailDTO> GetByIdForAdminAsync(int id)
+    public async Task<ProductDetailForAdminDTO> GetByIdForAdminAsync(int id)
     {
         var product =
             await _productRepository.GetByIdForAdminAsync(id)
             ?? throw new KeyNotFoundException($"Producto con ID {id} no encontrado.");
         Log.Information("Producto encontrado: {@Product}", product);
-        return product.Adapt<ProductDetailDTO>();
+        return product.Adapt<ProductDetailForAdminDTO>();
     }
 
     public async Task<string> CreateAsync(CreateProductDTO createProductDTO)
@@ -168,8 +168,109 @@ public class ProductService : IProductService
         return product.Id.ToString();
     }
 
-    public async Task ToggleActiveAsync(int id)
+    public async Task<string> UpdateAsync(int id, UpdateProductDTO updateProductDTO)
     {
-        await _productRepository.ToggleActiveAsync(id);
+        Product existingProduct =
+            await _productRepository.GetByIdForAdminAsync(id, true)
+            ?? throw new KeyNotFoundException($"Producto con ID {id} no encontrado.");
+
+        // Actualizar la categoría si es necesario
+        if (existingProduct.CategoryId != updateProductDTO.CategoryId && updateProductDTO.CategoryId.HasValue)
+        {
+            // Verificar si la nueva categoría existe
+            var category = await _categoryRepository.GetByIdAsync(updateProductDTO.CategoryId.Value);
+            if (category == null) Log.Warning($"La categoría con ID {updateProductDTO.CategoryId.Value} no existe.");
+
+            existingProduct.CategoryId = updateProductDTO.CategoryId.Value;
+        }
+
+        // Actualizar la marca si es necesario
+        if (existingProduct.BrandId != updateProductDTO.BrandId && updateProductDTO.BrandId.HasValue)
+        {
+            // Verificar si la nueva marca existe
+            var brand = await _brandRepository.GetByIdAsync(updateProductDTO.BrandId.Value);
+            if (brand == null) Log.Warning($"La marca con ID {updateProductDTO.BrandId.Value} no existe.");
+
+            existingProduct.BrandId = updateProductDTO.BrandId.Value;
+        }
+
+        // Actualizar las imagenes si se proporcionan nuevas imágenes
+        if (updateProductDTO.Images != null && updateProductDTO.Images.Any())
+        {
+            // Eliminar las imágenes existentes del producto
+            if (existingProduct.Images != null && existingProduct.Images.Any())
+            {
+                foreach (var image in existingProduct.Images)
+                {
+                    Log.Information("Eliminando imagen existente asociada al producto: {ImageUrl}", image.ImageUrl);
+                    var result = await _fileService.DeleteAsync(image.PublicId);
+                    if (!result)
+                    {
+                        Log.Warning("No se pudo eliminar la imagen: {ImageUrl}", image.ImageUrl);
+                        throw new Exception($"No se pudo eliminar la imagen: {image.ImageUrl}");
+                    }
+                }
+            }
+
+            // Subir las nuevas imágenes y asociarlas al producto
+            foreach (var image in updateProductDTO.Images)
+            {
+                Log.Information("Subiendo nueva imagen asociada al producto: {FileName}", image.FileName);
+                var result = await _fileService.UploadAsync(image, existingProduct.Id);
+                if (!result)
+                {
+                    Log.Warning("No se pudo subir la imagen: {FileName}", image.FileName);
+                    throw new Exception($"No se pudo subir la imagen: {image.FileName}");
+                }
+            }
+        }
+
+        // Actualizar las propiedades del producto existente con los valores del DTO
+        updateProductDTO.Adapt(existingProduct);
+
+        await _productRepository.UpdateAsync(existingProduct);
+        Log.Information("Producto actualizado: {@Product}", existingProduct);
+
+        return existingProduct.Id.ToString();
+    }
+
+    public async Task<string> ToggleActiveAsync(int id)
+    {
+        var product =
+            await _productRepository.GetByIdForAdminAsync(id, true)
+            ?? throw new KeyNotFoundException($"Producto con ID {id} no encontrado.");
+
+        var result = await _productRepository.ToggleActiveAsync(product);
+        if (!result) throw new Exception("No se pudo actualizar el estado del producto.");
+        Log.Information("Estado del producto actualizado: {@Product}", product);
+        return "Estado del producto actualizado correctamente.";
+    }
+
+    public async Task<string> DeleteAsync(int id)
+    {
+        var product =
+            await _productRepository.GetByIdForAdminAsync(id, true)
+            ?? throw new KeyNotFoundException($"Producto con ID {id} no encontrado.");
+
+        var deleted = await _productRepository.DeleteAsync(product);
+        if (!deleted) throw new Exception("No se pudo eliminar el producto.");
+
+        Log.Information("Producto eliminado: {@Product}", product);
+
+        return "Producto eliminado correctamente.";
+    }
+
+    public async Task<string> UpdateProductDiscountAsync(int id, UpdateProductDiscountDTO updateProductDiscountDTO)
+    {
+        Product existingProduct =
+            await _productRepository.GetByIdForAdminAsync(id, true)
+            ?? throw new KeyNotFoundException($"Producto con ID {id} no encontrado.");
+
+        existingProduct.Discount = updateProductDiscountDTO.Discount;
+
+        await _productRepository.UpdateAsync(existingProduct);
+        Log.Information("Descuento del producto actualizado: {@Product}", existingProduct);
+
+        return "Descuento del producto actualizado correctamente.";
     }
 }

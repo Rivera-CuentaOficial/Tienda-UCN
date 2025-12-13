@@ -14,7 +14,7 @@ public class Product
     public required string Title { get; set; }
     public required string Description { get; set; }
     public required int Price { get; set; }
-    public int Discount { get; set; }
+    public required int Discount { get; set; }
     public required int Stock { get; set; }
     public bool IsAvailable { get; set; } = true;
     public int CategoryId { get; set; }
@@ -22,7 +22,9 @@ public class Product
     public int BrandId { get; set; }
     public Brand Brand { get; set; } = null!;
     public required Status Status { get; set; }
+    public required bool IsDeleted { get; set; } = false;
     public ICollection<Image> Images { get; set; } = new List<Image>();
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? DeletedAt { get; set; }
 }

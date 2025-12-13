@@ -12,15 +12,6 @@ public class ProductRepository : IProductRepository
     private readonly IConfiguration _configuration;
     private readonly int _defaultPageSize;
 
-    public async Task<int> CreateAsync(Product product)
-    {
-        await _context.Products.AddAsync(product);
-        await _context.SaveChangesAsync();
-        return product.Id;
-    }
-
-
-
     public ProductRepository(DataContext context, IConfiguration configuration)
     {
         _context = context;
@@ -30,6 +21,18 @@ public class ProductRepository : IProductRepository
             ?? throw new ArgumentNullException(
                 "El tamaño de página por defecto no puede ser nulo."
             );
+    }
+
+    public async Task<int> CreateAsync(Product product)
+    {
+        await _context.Products.AddAsync(product);
+        await _context.SaveChangesAsync();
+        return product.Id;
+    }
+
+    public async Task<bool> UpdateAsync(Product existingProduct)
+    {
+        return await _context.SaveChangesAsync() > 0;
     }
 
     public async Task<(IEnumerable<Product> products, int totalCount)> GetFilteredForAdminAsync(
@@ -107,21 +110,11 @@ public class ProductRepository : IProductRepository
         return (products, totalCount);
     }
 
-    public async Task<Product?> GetByIdAsync(int id)
+    public async Task<Product?> GetByIdAsync(int id, bool asTracking = false)
     {
-        return await _context
-            .Products.AsNoTracking()
-            .Where(p => p.Id == id && p.IsAvailable)
-            .Include(p => p.Category)
-            .Include(p => p.Brand)
-            .Include(p => p.Images)
-            .FirstOrDefaultAsync();
-    }
-
-    public async Task<Product?> GetByIdForAdminAsync(int id)
-    {
-        return await _context
-            .Products.AsNoTracking()
+        IQueryable<Product> query = _context.Products;
+        if (!asTracking) query = query.AsNoTracking();
+        return await query
             .Where(p => p.Id == id)
             .Include(p => p.Category)
             .Include(p => p.Brand)
@@ -129,11 +122,23 @@ public class ProductRepository : IProductRepository
             .FirstOrDefaultAsync();
     }
 
-    public async Task ToggleActiveAsync(int id)
+    public async Task<Product?> GetByIdForAdminAsync(int id, bool asTracking = false)
     {
-        await _context
-            .Products.Where(p => p.Id == id)
-            .ExecuteUpdateAsync(p => p.SetProperty(p => p.IsAvailable, p => !p.IsAvailable));
+        IQueryable<Product> query = _context.Products;
+        if (!asTracking) query = query.AsNoTracking();
+        return await query
+            .Where(p => p.Id == id)
+            .Include(p => p.Category)
+            .Include(p => p.Brand)
+            .Include(p => p.Images)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<bool> ToggleActiveAsync(Product product)
+    {
+        return await _context
+            .Products.Where(p => p.Id == product.Id)
+            .ExecuteUpdateAsync(p => p.SetProperty(p => p.IsAvailable, p => !p.IsAvailable)) > 0;
     }
 
     public async Task<int> GetRealStockAsync(int productId)
@@ -147,11 +152,10 @@ public class ProductRepository : IProductRepository
 
     public async Task UpdateStockAsync(int productId, int stock)
     {
-        Product? product =
-            await _context.Products.FindAsync(productId)
-            ?? throw new KeyNotFoundException("Producto no encontrado");
-        product.Stock = stock;
-        await _context.SaveChangesAsync();
+        await _context
+            .Products
+            .Where(p => p.Id == productId)
+            .ExecuteUpdateAsync(p => p.SetProperty(p => p.Stock, p => stock));
     }
 
     public async Task<int> CountProductsByCategoryIdAsync(int categoryId)
@@ -166,5 +170,17 @@ public class ProductRepository : IProductRepository
         return await _context.Products
             .Where(p => p.BrandId == brandId)
             .CountAsync();
+    }
+
+    public async Task<bool> DeleteAsync(Product product)
+    {
+        return await _context
+            .Products
+            .Where(p => p.Id == product.Id)
+            .ExecuteUpdateAsync(p =>
+                p
+                    .SetProperty(p => p.IsDeleted, p => true)
+                    .SetProperty(p => p.DeletedAt, p => DateTime.UtcNow)
+            ) > 0;
     }
 }

@@ -9,8 +9,10 @@ public interface IProductService
     Task<ListedProductsForAdminDTO> GetFilteredForAdminAsync(SearchParamsDTO searchParams);
     Task<ListedProductsForCustomerDTO> GetFilteredForCustomerAsync(SearchParamsDTO searchParams);
     Task<ProductDetailDTO> GetByIdAsync(int id);
-    Task<ProductDetailDTO> GetByIdForAdminAsync(int id);
+    Task<ProductDetailForAdminDTO> GetByIdForAdminAsync(int id);
     Task<string> CreateAsync(CreateProductDTO createProductDTO);
-
-    Task ToggleActiveAsync(int id);
+    Task<string> UpdateAsync(int id, UpdateProductDTO updateProductDTO);
+    Task<string> ToggleActiveAsync(int id);
+    Task<string> DeleteAsync(int id);
+    Task<string> UpdateProductDiscountAsync(int id, UpdateProductDiscountDTO updateProductDiscountDTO);
 }
